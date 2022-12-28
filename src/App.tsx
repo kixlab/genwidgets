@@ -1,5 +1,5 @@
 import './App.css';
-import Canvas from './Components/canvas';
+import DragAndDrop from './Components/dragndrop';
 
 function App() {
   const drawArt = (context: CanvasRenderingContext2D) => {
@@ -13,9 +13,15 @@ function App() {
     // ctx.stroke();
     // ctx.closePath();
     // ctx.restore();
+
+    // widthPercent/heights
   };
   return (
-    <Canvas draw={drawArt} width={window.innerWidth} height={window.innerHeight} />
+    <DragAndDrop
+    // canvasHeight={250} canvasWidth={500}
+    // width={window.innerWidth} height={window.innerHeight} 
+    />
+    // <Canvas></Canvas>
   );
 }
 
