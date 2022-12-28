@@ -36,7 +36,7 @@ import {
   
   const ZOOM_SENSITIVITY = 500; // bigger for lower zoom per scroll
   
-  const Canvas :  React.FC<Point> = (...props) => {
+  function Canvas(props: CanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
     const [scale, setScale] = useState<number>(1);
