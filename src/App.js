@@ -1,11 +1,15 @@
-import logo from './logo.svg';
 import './App.css';
-import DragAndDrop from './Components/DragAndDrop';
+import * as React from 'react';
+//import DragAndDrop from './Components/DragAndDrop';
+// import MyComponent from './Components/Canvas'
+import { Sticky } from './Components/Sticky';
+import { StickySingle } from './Components/StickySingle';
+
 
 function App() {
   return (
     <div className="App">
-      <DragAndDrop />
+      <Sticky />
     </div>
   );
 }

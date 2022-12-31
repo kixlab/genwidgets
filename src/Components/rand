@@ -1,0 +1,46 @@
+// import React from 'react';
+// import { Stage, Layer, Text } from 'react-konva';
+
+// export default class MyComponent extends React.Component {
+//   state = {
+//     text: ''
+//   };
+
+//   handleTextChange = e => {
+//     this.setState({ text: e.target.value });
+//   };
+
+//   handleDragEnd = e => {
+//     // You can access the final position of the text
+//     // by using e.target.x() and e.target.y()
+//   };
+
+//   render() {
+//     return (
+//       <div>
+//         <textarea
+//           value={this.state.text}
+//           onChange={this.handleTextChange}
+//           style={{
+//             position: 'absolute',
+//             top: 50,
+//             left: 50,
+//             width: 100,
+//             height: 50
+//           }}
+//         />
+//         <Stage width={window.innerWidth} height={window.innerHeight}>
+//           <Layer>
+//             <Text
+//               text={this.state.text}
+//               x={50}
+//               y={50}
+//               draggable
+//               onDragEnd={this.handleDragEnd}
+//             />
+//           </Layer>
+//         </Stage>
+//       </div>
+//     );
+//   }
+// }
