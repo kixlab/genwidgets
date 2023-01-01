@@ -27,7 +27,10 @@ export function EditableText({
   }
 
   function handleTextChange(e) {
-    onChange(e.currentTarget.value);
+
+    onChange(e.target.value);
+    e.preventDefault();
+
   }
 
   if (isEditing) {
