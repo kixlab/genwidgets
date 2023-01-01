@@ -1,154 +1,10 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Group, Rect, Text, Transformer  } from "react-konva";
-import { EditableTextInput } from "./EditableTextInput";
-
-function ResizableText({
-  x,
-  y,
-  text,
-  noteProps,
-  isSelected,
-  width,
-  onChange,
-  onClick,
-  onDoubleClick
-}) {
-  const textRef = useRef(null);
-  const transformerRef = useRef(null);
-
-  useEffect(() => {
-    if (isSelected && transformerRef.current !== null) {
-      transformerRef.current.nodes([textRef.current]);
-      transformerRef.current.getLayer().batchDraw();
-    }
-  }, [isSelected]);
-
-  function handleResize() {
-    if (textRef.current !== null) {
-      const textNode = textRef.current;
-      const newWidth = textNode.width() * textNode.scaleX();
-      const newHeight = textNode.height() * textNode.scaleY();
-      textNode.scaleX(1);
-      textNode.scaleY(1);
-      textNode.setAttrs({
-        width: Math.max(textNode.width() * textNode.scaleX(), 5),
-        scaleX: 1,
-        scaleY: 1,
-      });
-      onChange({
-        ...noteProps,
-        width: newWidth, 
-      });
-    }
-  }
-
-
-  const transformer = isSelected ? (
-    <Transformer
-      ref={transformerRef}
-      padding= {5}
-      // enable only side anchors
-      enabledAnchors= {['middle-left', 'middle-right']}
-      // limit transformer size
-      boundBoxFunc= {(oldBox, newBox) => {
-        if (newBox.width < 5) {
-          return oldBox;
-        }
-        return newBox;
-      }}
-      rotateEnabled={false}
-      flipEnabled={false}
-
-    />
-  ) : null;
-
-  return (
-    //<>
-      <Text
-        x={x}
-        y={y}
-        ref={textRef}
-        text={text}
-        fill="white"
-        fontFamily="sans-serif"
-        fontSize={24}
-        perfectDrawEnabled={false}
-        //onTransform={handleResize}
-        onClick={onClick}
-        onTap={onClick}
-        onDblClick={onDoubleClick}
-        onDblTap={onDoubleClick}
-        width={width}
-        draggable={false}
-        // onDragStart={onDragStart}
-        // onDragEnd={onDragEnd}        
-      />
-      //{transformer}
-    //</>
-  );
-}
+import { Group, Rect, Text } from "react-konva";
+import { TextEditor } from "./TextEditor"
 
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
-
-function EditableText({
-  x,
-  y,
-  text,
-  width,
-  height,
-  noteProps,
-  isEditing,
-  isTransforming,
-  onToggleEdit,
-  onToggleTransform,
-  onChange,
-  //onResize
-}) {
-  function handleEscapeKeys(e) {
-    if ((e.keyCode === RETURN_KEY && !e.shiftKey) || e.keyCode === ESCAPE_KEY) {
-      onToggleEdit(e);
-    }
-  }
-
-  const handleTextChange = (e) => {
-    onChange({
-      ...noteProps,
-      text: e.currentTarget.value,
-    });
-  }
-
-  if (isEditing) {
-    return (
-      <EditableTextInput
-        x={x}
-        y={y}
-        width={width}
-        height={height}
-        value={text}
-        noteProps={noteProps}
-        onChange={handleTextChange}
-        onKeyDown={handleEscapeKeys}
-      />
-    );
-  }
-  return (
-    <ResizableText
-      x={x}
-      y={y}
-      isSelected={isTransforming}
-      onClick={onToggleTransform}
-      onDoubleClick={onToggleEdit}
-      //onResize={onResize}
-      onChange={onChange}
-      text={text}
-      width={width}
-      noteProps={noteProps}
-    />
-  );
-}
-
 
 export function StickyNote({
   x,
@@ -161,75 +17,95 @@ export function StickyNote({
   isSelected, 
   onSelect, 
   onChange,
-
-  // onTextResize,
-  // onTextChange,
-  onTextClick
+  onTextClick,
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [isTransforming, setIsTransforming] = useState(false);
+  const textRef = useRef(null);
 
   useEffect(() => {
     if (!isSelected && isEditing) {
       setIsEditing(false);
-    } else if (!isSelected && isTransforming) {
-      setIsTransforming(false);
-    }
-  }, [isSelected, isEditing, isTransforming]);
+    } 
+  }, [isSelected, isEditing]);
 
   function toggleEdit() {
     setIsEditing(!isEditing);
     onTextClick(!isEditing);
   }
-
-  function toggleTransforming() {
-    setIsTransforming(!isTransforming);
-    onTextClick(!isTransforming);
+  
+  const handleTextChange = (e) => {
+    onChange({
+      ...noteProps,
+      text: e.currentTarget.value,
+    });
   }
-
+  function handleEscapeKeys(e) {
+    if ((e.keyCode === RETURN_KEY && !e.shiftKey) || e.keyCode === ESCAPE_KEY) {
+      toggleEdit(e);
+    }
+  }
   return (
     <Group 
         x={x} 
         y={y} 
         draggable
         >
-      <Rect
-        x={20}
-        y={20}
+      {/* <Rect
+        x={2}
+        y={2}
         width={width}
-        height={height + 40}
+        height={height + 2}
         fill={"#8900e1"}
         scaleX={isSelected ? 1.2 : 1}
         scaleY={isSelected ? 1.2 : 1}
+        opacity={0.2}
         perfectDrawEnabled={false}
-      />
+      /> */}
       <Rect
-        x={0}
-        y={0}
-        width={width + 40}
-        height={height + 60}
+        x={isSelected ? 0 : 10}
+        y={isSelected ? 0 : 20}
+        width={width + 20}
+        height={height + 20}
         fill={"#8900e1"}
         perfectDrawEnabled={false}
         onClick={onSelect}
-        scaleX={isSelected ? 1.2 : 1}
+        scaleX={isSelected ? 1.1 : 1}
         scaleY={isSelected ? 1.2 : 1}
+        opacity={0.42}
         onTap={onSelect}
       />
-      <EditableText
+      <Text
         x={20}
         y={40}
         text={text}
+        fill={'#ffffff'}
+        fontFamily={'sans-serif'}
+        perfectDrawEnabled={false}
+        fontSize={18}
+        ref={textRef}
         width={width}
-        height={height}
-        noteProps={noteProps}
-        //onResize={onTextResize}
-        isEditing={isEditing}
-        isTransforming={isTransforming}
-        onToggleEdit={toggleEdit}
-        onToggleTransform={toggleTransforming}
-        onChange={onChange}
-        //onChange={onTextChange}
+        onClick={() => {
+          setIsEditing(true);
+        }}
+        onDblClick={onSelect}
+        visible={!isEditing}
       />
+      {isEditing && (
+          <TextEditor
+            x={20}
+            y={40}
+            value={text}
+            textNodeRef={textRef}
+            width={width}
+            height={height}
+            onChange={handleTextChange}
+            onKeyUp={handleEscapeKeys}
+            onKeyDown={handleEscapeKeys}
+            onBlur={() => {
+              setIsEditing(false);
+            }}
+          />
+      )}
     </Group>
   );
 }
