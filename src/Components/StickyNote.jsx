@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from "react";
 import { Group, Rect, Text } from "react-konva";
 import { TextEditor } from "./TextEditor"
 
-
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
 
@@ -18,9 +17,18 @@ export function StickyNote({
   onSelect, 
   onChange,
   onTextClick,
+  //isDragged,
+
+  // onDragStart,
+  // onDragEnd,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const textRef = useRef(null);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    console.log('className 👉️', ref.current.className);
+  }, []);
 
   useEffect(() => {
     if (!isSelected && isEditing) {
@@ -39,16 +47,24 @@ export function StickyNote({
       text: e.currentTarget.value,
     });
   }
+  
   function handleEscapeKeys(e) {
     if ((e.keyCode === RETURN_KEY && !e.shiftKey) || e.keyCode === ESCAPE_KEY) {
       toggleEdit(e);
     }
   }
+  
   return (
-    <Group 
+    <div className="item" >
+    <Group
+        className={"hello"}
+        ref={ref}
         x={x} 
         y={y} 
         draggable
+        onDragStart={(e) => {
+          console.log(e.target.position());
+        }}
         >
       {/* <Rect
         x={2}
@@ -67,12 +83,21 @@ export function StickyNote({
         width={width + 20}
         height={height + 20}
         fill={"#8900e1"}
+        cornerRadius={4}
         perfectDrawEnabled={false}
-        onClick={onSelect}
         scaleX={isSelected ? 1.1 : 1}
         scaleY={isSelected ? 1.2 : 1}
         opacity={0.42}
-        onTap={onSelect}
+        shadowColor="black"
+        shadowBlur={10}
+        shadowOpacity={0.3}
+        shadowOffsetX={10}
+        shadowOffsetY={10}
+        onMouseOver={onSelect}
+        onDragStart={() => {
+          console.log("hello");
+        }}
+        // onDragEnd={onDragEnd}
       />
       <Text
         x={20}
@@ -87,7 +112,6 @@ export function StickyNote({
         onClick={() => {
           setIsEditing(true);
         }}
-        onDblClick={onSelect}
         visible={!isEditing}
       />
       {isEditing && (
@@ -107,5 +131,6 @@ export function StickyNote({
           />
       )}
     </Group>
+    </div>
   );
 }

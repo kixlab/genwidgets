@@ -49,7 +49,7 @@ export const TextEditor = ({
   // });
 
   return (
-    <Html groupProps={{ x, y }} divProps={{ style: { opacity: 1 } }}>
+    <Html groupProps={{ x, y }} divProps={{ style: { opacity: 0.83 } }}>
       <textarea
         className="polotno-input"
         style={{

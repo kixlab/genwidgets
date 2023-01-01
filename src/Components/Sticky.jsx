@@ -7,7 +7,25 @@ export const Sticky = () => {
   const [notes, setNotes] = useState([]);
   const [selectedId, selectNote] = useState(null);
 
-  function handleButtonClick() {
+  // const [draggedId, setDraggedItem] = useState(null);
+
+  // const handleDragStart = (event) => {
+  //   const target = event.target;
+  //   setDraggedItem(target);
+  // };
+
+  // const handleDragEnd = (event) => {
+  //   const target = event.target;
+  //   if (draggedItem && target) {
+  //       const text1 = draggedItem.value || '';
+  //       const text2 = target.value || '';
+  //       target.value = text2 + ' and ' + text1;
+  //       draggedItem = null
+  //     }
+  //   setDraggedItem(null);
+  // };
+
+  function handleAddClick() {
     setNotes([...notes, { 
       id: newid.current++,
       x: 100, 
@@ -17,7 +35,19 @@ export const Sticky = () => {
       height: 200,
     }]);
   }
-  useEffect(() => { console.log(notes,selectedId) }, [notes,selectedId])
+
+  function handleDeleteClick() {
+    setNotes(notes.filter((note) => note.id!== selectedId));
+  }
+
+  useEffect(() => { 
+    console.log(notes,selectedId,
+      //draggedItem
+      ) }, 
+    [notes,selectedId,
+      //draggedItem
+    ]
+    )
 
   const checkDeselect = (e) => {
     // deselect when clicked on empty area
@@ -29,7 +59,10 @@ export const Sticky = () => {
 
   return (
     <div>
-    <button onClick={handleButtonClick}>Add Note</button>
+      <aside><h1>Genwidgets</h1></aside>
+    <button class="Add-note-btn" onClick={handleAddClick}>Add Note</button>
+    &nbsp;
+    <button class="Delete-note-btn" onClick={handleDeleteClick}>Delete Note</button>
     <Stage
       width={window.innerWidth}
       height={window.innerHeight}
@@ -37,14 +70,6 @@ export const Sticky = () => {
       onTouchStart={checkDeselect}
     >
       <Layer >
-      <Circle
-          name="draggableCircle"
-          x={50}
-          y={50}
-          radius={25}
-          fill="green"
-          draggable
-        />
       {notes.map((note, index) => {
         return(
         <StickyNote
@@ -65,6 +90,15 @@ export const Sticky = () => {
             newNotes[index] = newAttrs;
             setNotes(newNotes);
           }}
+          // isDragged={note.id = draggedId}
+          // onDragStart={() => {
+          //   setDraggedItem(note.id);
+          // }}
+          // onDragEnd={() => {
+          //   setDraggedItem(null);
+          // }}
+          // onDragStart={handleDragStart}
+          // onDragEnd={handleDragEnd}
         />
         );
       })}
