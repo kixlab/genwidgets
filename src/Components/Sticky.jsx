@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Stage, Layer, Circle } from "react-konva";
 import { StickyNote } from "./StickyNote";
 
-const JOIN_DIST = 30;
+const JOIN_DIST = 300;
 
 export const Sticky = () => {
   const newid = useRef(0);
@@ -83,8 +83,8 @@ export const Sticky = () => {
   }, [notes]);
 
   // this can be made cheaper
-  
-  useEffect(() =>  {
+  // concatonates nodes to the oldest and nearest node
+  const handleConcatClick = () =>  {
     if (minDistance.distance !== null && minDistance.distance < JOIN_DIST) {
       const [node1, node2] = minDistance.nodes;
       const [node1text, node2text] = [node1.text, node2.text]
@@ -97,7 +97,7 @@ export const Sticky = () => {
       });
       setNotes(newNotes.filter((note) => note.id!== node2.id));
     }
-  }, [selectedId]);
+  }
 
   
 
@@ -119,6 +119,8 @@ export const Sticky = () => {
     <button class="Add-note-btn" onClick={handleAddClick}>Add Note</button>
     &nbsp;
     <button class="Delete-note-btn" onClick={handleDeleteClick}>Delete Note</button>
+    &nbsp;
+    <button class="Concat-note-btn" onClick={handleConcatClick}>Concat Near</button>
     <Stage
       width={window.innerWidth}
       height={window.innerHeight}
