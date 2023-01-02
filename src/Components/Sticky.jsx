@@ -4,12 +4,130 @@ import { StickyNote } from "./StickyNote";
 
 const JOIN_DIST = 300;
 
+// for stage pan and zoom
+
+const scaleBy = 1.01;
+
+function getDistance(p1, p2) {
+  return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+}
+
+function getCenter(p1, p2) {
+  return {
+    x: (p1.x + p2.x) / 2,
+    y: (p1.y + p2.y) / 2,
+  };
+}
+
+function isTouchEnabled() { 
+  return ( 'ontouchstart' in window ) ||  
+         ( navigator.maxTouchPoints > 0 ) ||  
+         ( navigator.msMaxTouchPoints > 0 ); 
+} 
+
+// --- for stage pan and zoom ends ---
+
 export const Sticky = () => {
   const newid = useRef(0);
   const [notes, setNotes] = useState([]);
   const [selectedId, selectNote] = useState(null);
 
   const [minDistance, setMinDistance] = useState({ distance: null, nodes: [] });
+
+  // for stage pan and zoom
+
+  const stageRef = useRef(null);
+  let lastCenter = null;
+  let lastDist = 0;
+  
+  function zoomStage(event) {
+    event.evt.preventDefault();
+    if (stageRef.current !== null) {
+      const stage = stageRef.current;
+      const oldScale = stage.scaleX();
+      const { x: pointerX, y: pointerY } = stage.getPointerPosition();
+      const mousePointTo = {
+        x: (pointerX - stage.x()) / oldScale,
+        y: (pointerY - stage.y()) / oldScale,
+      };
+      const newScale = event.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+      stage.scale({ x: newScale, y: newScale });
+      const newPos = {
+        x: pointerX - mousePointTo.x * newScale,
+        y: pointerY - mousePointTo.y * newScale,
+      }
+      stage.position(newPos);
+      stage.batchDraw();
+    }
+  }
+
+  function handleTouch(e) {
+    e.evt.preventDefault();
+    var touch1 = e.evt.touches[0];
+    var touch2 = e.evt.touches[1];
+    const stage = stageRef.current;
+    if (stage !== null) {
+      if (touch1 && touch2) {
+        if (stage.isDragging()) {
+          stage.stopDrag();
+        }
+  
+        var p1 = {
+          x: touch1.clientX,
+          y: touch1.clientY
+        };
+        var p2 = {
+          x: touch2.clientX,
+          y: touch2.clientY
+        };
+  
+        if (!lastCenter) {
+          lastCenter = getCenter(p1, p2);
+          return;
+        }
+        var newCenter = getCenter(p1, p2);
+  
+        var dist = getDistance(p1, p2);
+  
+        if (!lastDist) {
+          lastDist = dist;
+        }
+  
+        // local coordinates of center point
+        var pointTo = {
+          x: (newCenter.x - stage.x()) / stage.scaleX(),
+          y: (newCenter.y - stage.y()) / stage.scaleX()
+        };
+  
+        var scale = stage.scaleX() * (dist / lastDist);
+  
+        stage.scaleX(scale);
+        stage.scaleY(scale);
+  
+        // calculate new position of the stage
+        var dx = newCenter.x - lastCenter.x;
+        var dy = newCenter.y - lastCenter.y;
+  
+        var newPos = {
+          x: newCenter.x - pointTo.x * scale + dx,
+          y: newCenter.y - pointTo.y * scale + dy
+        };
+  
+        stage.position(newPos);
+        stage.batchDraw();
+  
+        lastDist = dist;
+        lastCenter = newCenter;
+      }
+    }
+  }
+
+  function handleTouchEnd() {
+    lastCenter = null;
+    lastDist = 0;
+  }
+
+  //* --- for stage pan and zoom ends --- */ 
 
   // const handleDragStart = (event) => {
   //   const target = event.target;
@@ -42,14 +160,7 @@ export const Sticky = () => {
     setNotes(notes.filter((note) => note.id!== selectedId));
   }
 
-  useEffect(() => { 
-    console.log(notes,selectedId,
-      //draggedItem
-      ) }, 
-    [notes,selectedId,
-      //draggedItem
-    ]
-    )
+  useEffect(() => { console.log(notes,selectedId,) }, [notes,selectedId])
 
       // calculate the minimum distance between nodes
   useEffect(() => {
@@ -116,16 +227,38 @@ export const Sticky = () => {
         Minimum distance between nodes:{" "}
         {minDistance.nodes.map(node => node.id).join(", ")} ({minDistance.distance})
       </p>
-    <button class="Add-note-btn" onClick={handleAddClick}>Add Note</button>
-    &nbsp;
-    <button class="Delete-note-btn" onClick={handleDeleteClick}>Delete Note</button>
-    &nbsp;
+      <p>
+        Double tap on canvas to add text. Pan and zoom canvas as needed.
+      </p>
+    {/* <button class="Add-note-btn" onClick={handleAddClick}>Add Note</button>
+    &nbsp; */}
     <button class="Concat-note-btn" onClick={handleConcatClick}>Concat Near</button>
     <Stage
       width={window.innerWidth}
       height={window.innerHeight}
       onMouseDown={checkDeselect}
       onTouchStart={checkDeselect}
+      onDblClick={(e) => {
+        if (selectedId === null) {
+          setNotes([...notes, { 
+          id: newid.current++,
+          x: e.target.getPointerPosition().x, 
+          y: e.target.getPointerPosition().y, 
+          text: 'Tap to select. Double Tap to Edit.', 
+          width: 200,
+          height: 200,
+        }]);
+      }
+      }}
+
+      // for stage pan and zoom
+      draggable={!isTouchEnabled()}
+      onWheel={zoomStage}
+      onTouchMove={handleTouch}
+      onTouchEnd={handleTouchEnd}
+      ref={stageRef}
+      // ---------------------
+
     >
       <Layer >
       {notes.map((note, index) => {
@@ -151,6 +284,7 @@ export const Sticky = () => {
           onTextClick={() => {
             selectNote(note.id);
           }}
+          onDelete={handleDeleteClick}
           // isDragged={note.id = draggedId}
           // onDragStart={() => {
           //   setDraggedItem(note.id);

@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Group, Rect, Text } from "react-konva";
+import { Html } from 'react-konva-utils';
 import { TextEditor } from "./TextEditor"
 
 const RETURN_KEY = 13;
@@ -17,6 +18,7 @@ export function StickyNote({
   onSelect, 
   onChange,
   onTextClick,
+  onDelete,
   //isDragged,
 
   // onDragStart,
@@ -24,6 +26,7 @@ export function StickyNote({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const textRef = useRef(null);
+  const delBtnRf = useRef(null);
   const ref = useRef(null);
 
   useEffect(() => {
@@ -62,6 +65,7 @@ export function StickyNote({
     }
   }
   
+
   return (
     <div className="item" >
     <Group
@@ -75,6 +79,14 @@ export function StickyNote({
         }}
         onDragEnd={handleCoordChange}
         >
+        { isSelected &&
+          <Html 
+            innerRef={delBtnRf}
+            groupProps={{ x: 160, y: 220}} 
+            divProps={{ style: { opacity: 0.63} }} >
+            <button class="Delete-note-btn" onClick={onDelete} >Delete</button>
+          </Html>
+        }
       {/* <Rect
         x={2}
         y={2}
@@ -116,6 +128,7 @@ export function StickyNote({
         width={width}
         onClick={() => {
           setIsEditing(true);
+          onTextClick(); // fix text bug
         }}
         visible={!isEditing}
       />
