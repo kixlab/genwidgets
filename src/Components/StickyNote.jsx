@@ -41,6 +41,14 @@ export function StickyNote({
     onTextClick(!isEditing);
   }
   
+  const handleCoordChange = (e) => {
+    onChange({
+      ...noteProps,
+      x: e.target.position().x,
+      y: e.target.position().y,
+    });
+  }
+
   const handleTextChange = (e) => {
     onChange({
       ...noteProps,
@@ -63,8 +71,9 @@ export function StickyNote({
         y={y} 
         draggable
         onDragStart={(e) => {
-          console.log(e.target.position());
+          console.log('start'+e.target.position().x);
         }}
+        onDragEnd={handleCoordChange}
         >
       {/* <Rect
         x={2}
@@ -94,10 +103,6 @@ export function StickyNote({
         shadowOffsetX={10}
         shadowOffsetY={10}
         onMouseOver={onSelect}
-        onDragStart={() => {
-          console.log("hello");
-        }}
-        // onDragEnd={onDragEnd}
       />
       <Text
         x={20}
