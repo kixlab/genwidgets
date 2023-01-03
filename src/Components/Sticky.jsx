@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Stage, Layer, Circle } from "react-konva";
+import { Stage, Layer } from "react-konva";
 import { StickyNote } from "./StickyNote";
 
 const JOIN_DIST = 300;
@@ -33,6 +33,10 @@ export const Sticky = () => {
   const [selectedId, selectNote] = useState(null);
 
   const [minDistance, setMinDistance] = useState({ distance: null, nodes: [] });
+
+  const [clipboardNote, setClipboardNote] = useState(null);
+  const [lastTouch, setLastTouch] = useState({x:null, y:null});
+  const [isEditing, setIsEditing] = useState(false);
 
   // for stage pan and zoom
 
@@ -145,6 +149,13 @@ export const Sticky = () => {
   //   setDraggedItem(null);
   // };
 
+  // useEffect(() => {
+  //   if (lastTouch === 'undefined') {
+  //     let selectNote = [...notes].filter(note => note.id === selectedId)[0]
+  //     setLastTouch({x:selectNote.x, y:selectNote.y})
+  //   }
+  // });
+
   function handleAddClick() {
     setNotes([...notes, { 
       id: newid.current++,
@@ -156,11 +167,12 @@ export const Sticky = () => {
     }]);
   }
 
-  function handleDeleteClick() {
+  const handleDeleteClick = (e) => {
     setNotes(notes.filter((note) => note.id!== selectedId));
+    //setLastTouch(e.target.getRelativePointerPosition()); //  get better last position
   }
 
-  useEffect(() => { console.log(notes,selectedId,) }, [notes,selectedId])
+  useEffect(() => { console.log(notes,selectedId,[...notes].filter(note => note.id === selectedId)[0])}, [notes,selectedId])
 
       // calculate the minimum distance between nodes
   useEffect(() => {
@@ -210,18 +222,50 @@ export const Sticky = () => {
     }
   }
 
-  
+
+  const DELETE_KEY = 46;
+
+  const handleKeyDown = (event)=>{
+    // console.log(event)
+    // event.preventDefault()
+    let charCode = String.fromCharCode(event.which).toLowerCase();
+    if (!isEditing){
+    if((event.ctrlKey || event.metaKey) && charCode === 's') {
+      alert("Save feature does not exist");
+    }else if((event.ctrlKey || event.metaKey) && charCode === 'c' && selectedId !== null) {
+      setClipboardNote([...notes].filter(note => note.id === selectedId)[0]);
+    }else if((event.ctrlKey || event.metaKey) && charCode === 'x' && selectedId !== null) {
+      setClipboardNote([...notes].filter(note => note.id === selectedId)[0]);
+      handleDeleteClick();
+    }else if((event.keyCode === DELETE_KEY || event.metaKey) && selectedId !== null) {
+      handleDeleteClick();
+    }else if((event.ctrlKey || event.metaKey) && charCode === 'v') {
+      setNotes([...notes, { 
+        ...clipboardNote,
+        id: newid.current++,
+        ...lastTouch
+        // x: clipboardNote.x + 30,
+        // y: clipboardNote.y + 30
+      }]);
+    }}
+  }
 
   const checkDeselect = (e) => {
     // deselect when clicked on empty area
     const clickedOnEmpty = e.target === e.target.getStage();
+    // console.log(e.target.getRelativePointerPosition());
+    setLastTouch(e.target.getRelativePointerPosition());
     if (clickedOnEmpty) {
       selectNote(null);
+      setIsEditing(false);
     }
   };
 
   return (
-    <div>
+    <div 
+      tabIndex={1} 
+      onKeyDown={handleKeyDown}
+      >
       <aside><h1>Genwidgets</h1></aside>
       <p>
         Minimum distance between nodes:{" "}
@@ -238,18 +282,18 @@ export const Sticky = () => {
       height={window.innerHeight}
       onMouseDown={checkDeselect}
       onTouchStart={checkDeselect}
+      onClick={checkDeselect}
       onDblClick={(e) => {
         if (selectedId === null) {
           setNotes([...notes, { 
           id: newid.current++,
-          x: e.target.getPointerPosition().x, 
-          y: e.target.getPointerPosition().y, 
+          x: e.target.getRelativePointerPosition().x, // fixed position bug
+          y: e.target.getRelativePointerPosition().y, 
           text: 'Tap to select. Double Tap to Edit.', 
           width: 200,
           height: 200,
         }]);
-      }
-      }}
+      }}}
 
       // for stage pan and zoom
       draggable={!isTouchEnabled()}
@@ -275,6 +319,7 @@ export const Sticky = () => {
           isSelected={note.id === selectedId}
           onSelect={() => {
             selectNote(note.id);
+            setIsEditing(false);
           }}
           onChange={(newAttrs) => {
             const newNotes = notes.slice();
@@ -283,6 +328,7 @@ export const Sticky = () => {
           }}
           onTextClick={() => {
             selectNote(note.id);
+            setIsEditing(true);
           }}
           onDelete={handleDeleteClick}
           // isDragged={note.id = draggedId}
