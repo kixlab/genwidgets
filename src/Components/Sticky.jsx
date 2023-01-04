@@ -6,7 +6,7 @@ const JOIN_DIST = 300;
 
 // for stage pan and zoom
 
-const scaleBy = 1.01;
+const scaleBy = 0.99;
 
 function getDistance(p1, p2) {
   return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
@@ -30,7 +30,7 @@ function isTouchEnabled() {
 export const Sticky = () => {
   const newid = useRef(0);
   const [notes, setNotes] = useState([]);
-  const [selectedId, selectNote] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
 
   const [minDistance, setMinDistance] = useState({ distance: null, nodes: [] });
 
@@ -149,12 +149,12 @@ export const Sticky = () => {
   //   setDraggedItem(null);
   // };
 
-  // useEffect(() => {
-  //   if (lastTouch === 'undefined') {
-  //     let selectNote = [...notes].filter(note => note.id === selectedId)[0]
-  //     setLastTouch({x:selectNote.x, y:selectNote.y})
-  //   }
-  // });
+  useEffect(() => {
+    if (selectedId !== null) {
+      let selectNote = [...notes].filter(note => note.id === selectedId)[0]
+      setLastTouch({x:selectNote.x+30, y:selectNote.y+30})
+    } 
+  }, [notes]);
 
   function handleAddClick() {
     setNotes([...notes, { 
@@ -167,9 +167,9 @@ export const Sticky = () => {
     }]);
   }
 
-  const handleDeleteClick = (e) => {
+  const handleDeleteClick = () => {
     setNotes(notes.filter((note) => note.id!== selectedId));
-    //setLastTouch(e.target.getRelativePointerPosition()); //  get better last position
+    setSelectedId(null); 
   }
 
   useEffect(() => { console.log(notes,selectedId,[...notes].filter(note => note.id === selectedId)[0])}, [notes,selectedId])
@@ -178,8 +178,9 @@ export const Sticky = () => {
   useEffect(() => {
     if (notes.length > 1) {
       // use the Pythagorean theorem to calculate the distance between each pair of nodes
-      const distances = notes.map((note1, index1) => {
-        return notes.slice(index1 + 1).map((note2, index2) => {
+      const notesCopy = [...notes]
+      const distances = notesCopy.map((note1, index1) => {
+        return notesCopy.slice(index1 + 1).map((note2, index2) => {
           const a = note2.x - note1.x;
           const b = note2.y - note1.y;
           return {
@@ -207,18 +208,23 @@ export const Sticky = () => {
 
   // this can be made cheaper
   // concatonates nodes to the oldest and nearest node
-  const handleConcatClick = () =>  {
+  const handleConcatClick = (e) =>  {
+    e.preventDefault();
     if (minDistance.distance !== null && minDistance.distance < JOIN_DIST) {
       const [node1, node2] = minDistance.nodes;
       const [node1text, node2text] = [node1.text, node2.text]
-      const newNotes = notes.map(note => {
-        if (note.id === node1.id) {
-          return { ...note, text: node1text + ' and ' + node2text };
-        } else {
-          return note;
-        }
-      });
-      setNotes(newNotes.filter((note) => note.id!== node2.id));
+      const newNotes = notes.filter((note) => note.id!== node2.id);
+      // use timeout to fix timing issues
+      setTimeout(() => {
+        setNotes([...newNotes].map(note => {
+          if (note.id === node1.id) {
+            return { ...note, text: node1text + ' and ' + node2text };
+          } else {
+            return note;
+          }
+        }));
+      }, 100); // setnotes is slow
+      setSelectedId(null); 
     }
   }
 
@@ -256,7 +262,7 @@ export const Sticky = () => {
     // console.log(e.target.getRelativePointerPosition());
     setLastTouch(e.target.getRelativePointerPosition());
     if (clickedOnEmpty) {
-      selectNote(null);
+      setSelectedId(null);
       setIsEditing(false);
     }
   };
@@ -318,16 +324,16 @@ export const Sticky = () => {
           noteProps={note}
           isSelected={note.id === selectedId}
           onSelect={() => {
-            selectNote(note.id);
+            setSelectedId(note.id);
             setIsEditing(false);
           }}
           onChange={(newAttrs) => {
-            const newNotes = notes.slice();
-            newNotes[index] = newAttrs;
-            setNotes(newNotes);
+            const nwNotes = notes.slice();
+            nwNotes[index] = newAttrs;
+            setNotes(nwNotes);
           }}
           onTextClick={() => {
-            selectNote(note.id);
+            setSelectedId(note.id);
             setIsEditing(true);
           }}
           onDelete={handleDeleteClick}

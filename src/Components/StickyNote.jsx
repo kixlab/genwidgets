@@ -29,9 +29,9 @@ export function StickyNote({
   const delBtnRf = useRef(null);
   const ref = useRef(null);
 
-  useEffect(() => {
-    console.log('className 👉️', ref.current.className);
-  }, []);
+  // useEffect(() => {
+  //   console.log('className 👉️', ref.current.className);
+  // }, []);
 
   useEffect(() => {
     if (!isSelected && isEditing) {
@@ -74,9 +74,9 @@ export function StickyNote({
         x={x} 
         y={y} 
         draggable
-        onDragStart={(e) => {
-          console.log('start'+e.target.position().x);
-        }}
+        // onDragStart={(e) => {
+        //   console.log('start'+e.target.position().x);
+        // }}
         onDragEnd={handleCoordChange}
         >
         { isSelected &&
