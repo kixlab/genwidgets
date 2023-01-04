@@ -9,7 +9,9 @@ export const TextEditor = ({
   onBlur,
   onChange,
   onKeyDown,
-  onKeyUp
+  onKeyUp,
+  onClick,
+  onDoubleClick
 }) => {
   const [style, setStyle] = React.useState();
   React.useLayoutEffect(() => {
@@ -60,6 +62,8 @@ export const TextEditor = ({
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
         onBlur={onBlur}
+        onClick={onClick}
+        onDoubleClick={onDoubleClick}
       />
     </Html>
   );

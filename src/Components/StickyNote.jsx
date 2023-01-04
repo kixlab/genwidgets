@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Group, Rect, Text } from "react-konva";
 import { Html } from 'react-konva-utils';
 import { TextEditor } from "./TextEditor"
+import { TextResizer } from "./TextResizer";
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
@@ -25,6 +26,7 @@ export function StickyNote({
   // onDragEnd,
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isTransforming, setIsTransforming] = useState(false);
   const textRef = useRef(null);
   const delBtnRf = useRef(null);
   const ref = useRef(null);
@@ -36,12 +38,19 @@ export function StickyNote({
   useEffect(() => {
     if (!isSelected && isEditing) {
       setIsEditing(false);
-    } 
-  }, [isSelected, isEditing]);
+    } else if (!isSelected && isTransforming) {
+      setIsTransforming(false);
+    }
+  }, [isSelected, isEditing, isTransforming]);
 
   function toggleEdit() {
     setIsEditing(!isEditing);
-    onTextClick(!isEditing);
+    onTextClick();
+  }
+
+  function toggleTransform() {
+    setIsTransforming(!isTransforming);
+    onTextClick();
   }
   
   const handleCoordChange = (e) => {
@@ -56,6 +65,14 @@ export function StickyNote({
     onChange({
       ...noteProps,
       text: e.currentTarget.value,
+    });
+  }
+
+  const handleTextResize = (newWidth, newHeight) => {
+    onChange({
+      ...noteProps,
+      width: newWidth,
+      height: newHeight
     });
   }
   
@@ -82,7 +99,7 @@ export function StickyNote({
         { isSelected &&
           <Html 
             innerRef={delBtnRf}
-            groupProps={{ x: 160, y: 220}} 
+            groupProps={{ x: width-40 , y: height+10}} 
             divProps={{ style: { opacity: 0.63} }} >
             <button class="Delete-note-btn" onClick={onDelete} >Delete</button>
           </Html>
@@ -123,14 +140,12 @@ export function StickyNote({
         fill={'#ffffff'}
         fontFamily={'sans-serif'}
         perfectDrawEnabled={false}
-        fontSize={18}
+        fontSize={16}
         ref={textRef}
         width={width}
-        onClick={() => {
-          setIsEditing(true);
-          onTextClick(); // fix text bug
-        }}
-        visible={!isEditing}
+        onClick={toggleTransform}
+        onDblClick={toggleEdit}// more methods
+        visible={!isEditing && !isTransforming}
       />
       {isEditing && (
           <TextEditor
@@ -146,7 +161,21 @@ export function StickyNote({
             onBlur={() => {
               setIsEditing(false);
             }}
+            onClick={toggleTransform}
+            onDblClick={toggleEdit}
           />
+      )}
+      {isTransforming && (
+          <TextResizer
+          x={20}
+          y={40}
+          isSelected={isTransforming}
+          onClick={toggleTransform}
+          onDoubleClick={toggleEdit}
+          onResize={handleTextResize}
+          text={text}
+          width={width}
+        />
       )}
     </Group>
     </div>
