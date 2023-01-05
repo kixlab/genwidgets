@@ -230,6 +230,7 @@ export const Sticky = () => {
 
 
   const DELETE_KEY = 46;
+  const BACKSPACE = 8;
 
   const handleKeyDown = (event)=>{
     // console.log(event)
@@ -243,7 +244,7 @@ export const Sticky = () => {
     }else if((event.ctrlKey || event.metaKey) && charCode === 'x' && selectedId !== null) {
       setClipboardNote([...notes].filter(note => note.id === selectedId)[0]);
       handleDeleteClick();
-    }else if((event.keyCode === DELETE_KEY || event.metaKey) && selectedId !== null) {
+    }else if((event.keyCode === DELETE_KEY || event.keyCode === BACKSPACE || event.metaKey) && selectedId !== null) {
       handleDeleteClick();
     }else if((event.ctrlKey || event.metaKey) && charCode === 'v') {
       setNotes([...notes, { 

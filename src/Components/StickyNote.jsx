@@ -1,11 +1,19 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Group, Rect, Text } from "react-konva";
+import { Group, Rect, Text, Image } from "react-konva";
 import { Html } from 'react-konva-utils';
-import { TextEditor } from "./TextEditor"
+import useImage from 'use-image';
+import { TextEditor } from "./TextEditor";
 import { TextResizer } from "./TextResizer";
+
+const prong = "../Assets/prong.svg";
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
+
+const URLImage = (name) => {
+  const [image] = useImage(name);
+  return <Image image={image} />;
+};
 
 export function StickyNote({
   x,
@@ -115,6 +123,7 @@ export function StickyNote({
         opacity={0.2}
         perfectDrawEnabled={false}
       /> */}
+      {URLImage(prong)}
       <Rect
         x={isSelected ? 0 : 10}
         y={isSelected ? 0 : 20}
