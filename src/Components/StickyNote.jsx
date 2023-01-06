@@ -4,16 +4,30 @@ import { Html } from 'react-konva-utils';
 import useImage from 'use-image';
 import { TextEditor } from "./TextEditor";
 import { TextResizer } from "./TextResizer";
+import { InputText } from "./InputText";
 
-const prong = "../Assets/prong.svg";
+const prong = "https://konvajs.org/assets/yoda.jpg";
 
 const RETURN_KEY = 13;
 const ESCAPE_KEY = 27;
 
-const URLImage = (name) => {
-  const [image] = useImage(name);
-  return <Image image={image} />;
+// const URLImage = (url) => {
+//   const [image] = useImage(url);
+//   return (
+//   <Image 
+//     x={100}
+//     y={100}
+//     width={100}
+//     height={100}
+//     image={image}
+//   />
+//   )};
+
+const URLImage = ({ url, ...rest }) => {
+  const [image] = useImage(url);
+  return <Image image={image} {...rest} />;
 };
+
 
 export function StickyNote({
   x,
@@ -39,6 +53,10 @@ export function StickyNote({
   const delBtnRf = useRef(null);
   const ref = useRef(null);
 
+  const images = [
+    "https://user-images.githubusercontent.com/67339217/210928088-442ca3f8-9e6b-4918-93e3-f06932771d29.svg",
+  ];
+
   // useEffect(() => {
   //   console.log('className 👉️', ref.current.className);
   // }, []);
@@ -53,11 +71,13 @@ export function StickyNote({
 
   function toggleEdit() {
     setIsEditing(!isEditing);
+    setIsTransforming(!isTransforming);
     onTextClick();
   }
 
   function toggleTransform() {
     setIsTransforming(!isTransforming);
+    setIsEditing(!isEditing);
     onTextClick();
   }
   
@@ -90,6 +110,41 @@ export function StickyNote({
     }
   }
   
+  // const TextChurn = () => {
+  //   if (isEditing) {
+  //     return (
+  //       <TextEditor
+  //           x={20}
+  //           y={40}
+  //           width={width}
+  //           height={height}
+  //           value={text}
+  //           // textNodeRef={textRef}
+  //           onChange={handleTextChange}
+  //           onKeyUp={handleEscapeKeys}
+  //           onKeyDown={handleEscapeKeys}
+  //           onBlur={() => {
+  //             setIsEditing(false);
+  //           }}
+  //           // onClick={toggleTransform}
+  //           onDoubleClick={toggleTransform}
+  //         />
+  //     );
+  //   } else if (isTransforming) {
+  //     return (
+  //       <TextResizer
+  //         x={20}
+  //         y={40}
+  //         isSelected={isTransforming}
+  //         // onClick={toggleTransform}
+  //         onDoubleClick={toggleEdit}
+  //         onResize={handleTextResize}
+  //         text={text}
+  //         width={width}
+  //       />
+  //     );
+  //   } 
+  // }
 
   return (
     <div className="item" >
@@ -123,7 +178,9 @@ export function StickyNote({
         opacity={0.2}
         perfectDrawEnabled={false}
       /> */}
-      {URLImage(prong)}
+      {images.map((url, i) => (
+              <URLImage url={url} x={-48} y={40+i*20} key={i} visible={isSelected ? false : true} />
+            ))}
       <Rect
         x={isSelected ? 0 : 10}
         y={isSelected ? 0 : 20}
@@ -142,36 +199,37 @@ export function StickyNote({
         shadowOffsetY={10}
         onMouseOver={onSelect}
       />
-      <Text
+      <InputText
         x={20}
         y={40}
         text={text}
-        fill={'#ffffff'}
-        fontFamily={'sans-serif'}
-        perfectDrawEnabled={false}
-        fontSize={16}
         ref={textRef}
         width={width}
         onClick={toggleTransform}
         onDblClick={toggleEdit}// more methods
         visible={!isEditing && !isTransforming}
+
+        // fill={'#ffffff'}
+        // fontFamily={'sans-serif'}
+        // perfectDrawEnabled={false}
+        // fontSize={16}
       />
       {isEditing && (
           <TextEditor
             x={20}
             y={40}
-            value={text}
-            textNodeRef={textRef}
             width={width}
             height={height}
+            value={text}
+            textNodeRef={textRef}
             onChange={handleTextChange}
             onKeyUp={handleEscapeKeys}
             onKeyDown={handleEscapeKeys}
             onBlur={() => {
               setIsEditing(false);
             }}
-            onClick={toggleTransform}
-            onDblClick={toggleEdit}
+            // onClick={toggleTransform}
+            // onDoubleClick={toggleEdit}
           />
       )}
       {isTransforming && (
@@ -185,6 +243,7 @@ export function StickyNote({
           text={text}
           width={width}
         />
+        
       )}
     </Group>
     </div>
