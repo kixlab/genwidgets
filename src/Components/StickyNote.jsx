@@ -36,7 +36,7 @@ export function StickyNote({
   width,
   height,
   noteProps,
-
+  stageScale,
   isSelected, 
   onSelect, 
   onChange,
@@ -203,12 +203,12 @@ export function StickyNote({
         x={20}
         y={40}
         text={text}
-        ref={textRef}
+        noteProps={noteProps}
         width={width}
         onClick={toggleTransform}
         onDblClick={toggleEdit}// more methods
         visible={!isEditing && !isTransforming}
-
+        stageScale={stageScale}
         // fill={'#ffffff'}
         // fontFamily={'sans-serif'}
         // perfectDrawEnabled={false}

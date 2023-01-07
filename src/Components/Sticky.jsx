@@ -37,7 +37,7 @@ export const Sticky = () => {
   const [clipboardNote, setClipboardNote] = useState(null);
   const [lastTouch, setLastTouch] = useState({x:null, y:null});
   const [isEditing, setIsEditing] = useState(false);
-
+  const [scale, setScale] = useState(1);
   // for stage pan and zoom
 
   const stageRef = useRef(null);
@@ -55,6 +55,8 @@ export const Sticky = () => {
         y: (pointerY - stage.y()) / oldScale,
       };
       const newScale = event.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+      setScale(newScale);
+
       stage.scale({ x: newScale, y: newScale });
       const newPos = {
         x: pointerX - mousePointTo.x * newScale,
@@ -104,7 +106,7 @@ export const Sticky = () => {
         };
   
         var scale = stage.scaleX() * (dist / lastDist);
-  
+        setScale(scale);
         stage.scaleX(scale);
         stage.scaleY(scale);
   
@@ -172,7 +174,7 @@ export const Sticky = () => {
     setSelectedId(null); 
   }
 
-  useEffect(() => { console.log(notes,selectedId,[...notes].filter(note => note.id === selectedId)[0])}, [notes,selectedId])
+  useEffect(() => { console.log(notes,selectedId,scale,[...notes].filter(note => note.id === selectedId)[0])}, [notes,selectedId])
 
       // calculate the minimum distance between nodes
   useEffect(() => {
@@ -323,6 +325,7 @@ export const Sticky = () => {
           height={note.height}
           
           noteProps={note}
+          stageScale={scale}
           isSelected={note.id === selectedId}
           onSelect={() => {
             setSelectedId(note.id);
