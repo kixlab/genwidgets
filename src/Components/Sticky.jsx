@@ -135,21 +135,6 @@ export const Sticky = () => {
 
   //* --- for stage pan and zoom ends --- */ 
 
-  // const handleDragStart = (event) => {
-  //   const target = event.target;
-  //   setDraggedItem(target);
-  // };
-
-  // const handleDragEnd = (event) => {
-  //   const target = event.target;
-  //   if (draggedItem && target) {
-  //       const text1 = draggedItem.value || '';
-  //       const text2 = target.value || '';
-  //       target.value = text2 + ' and ' + text1;
-  //       draggedItem = null
-  //     }
-  //   setDraggedItem(null);
-  // };
 
   useEffect(() => {
     if (selectedId !== null) {
@@ -157,17 +142,6 @@ export const Sticky = () => {
       setLastTouch({x:selectNote.x+30, y:selectNote.y+30})
     } 
   }, [notes]);
-
-  function handleAddClick() {
-    setNotes([...notes, { 
-      id: newid.current++,
-      x: 100, 
-      y: 100, 
-      text: 'Tap to select. Double Tap to Edit.', 
-      width: 200,
-      height: 200,
-    }]);
-  }
 
   const handleDeleteClick = () => {
     setNotes(notes.filter((note) => note.id!== selectedId));
@@ -283,8 +257,6 @@ export const Sticky = () => {
       <p>
         Double tap on canvas to add text. Pan and zoom canvas as needed.
       </p>
-    {/* <button class="Add-note-btn" onClick={handleAddClick}>Add Note</button>
-    &nbsp; */}
     <button class="Concat-note-btn" onClick={handleConcatClick}>Concat Near</button>
     <Stage
       width={window.innerWidth}
@@ -341,15 +313,6 @@ export const Sticky = () => {
             setIsEditing(true);
           }}
           onDelete={handleDeleteClick}
-          // isDragged={note.id = draggedId}
-          // onDragStart={() => {
-          //   setDraggedItem(note.id);
-          // }}
-          // onDragEnd={() => {
-          //   setDraggedItem(null);
-          // }}
-          // onDragStart={handleDragStart}
-          // onDragEnd={handleDragEnd}
         />
         );
       })}
