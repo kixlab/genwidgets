@@ -24,6 +24,25 @@ export const InputText = ({
   const [prongInputPos, setProngInputpos] = useState([]);
 
   // change color of [[input]] using effect
+  // useEffect(() => {
+  //   const text = textRef.current.text();
+  //   const words = text.split(' ');
+  //   const newWords = words.map((word) => {
+  //     if (word === '[[input]]') {
+  //       return (
+  //         <span style= "colour:red" >
+  //           {word}
+  //         </span>
+  //       );
+  //     }
+  //     return word;
+  //   });
+  //   onChange({
+  //     ...noteProps,
+  //     text: newWords.join(' '),
+  //   });
+  // }, [noteProps.text]);
+
   useEffect(() => {
     const text = textRef.current;
     Object.entries(text.textArr).map(([key, value]) => {
@@ -37,7 +56,13 @@ export const InputText = ({
             // console.log(prongInputPos);
         }
     });
-    // adjust height function - to be written
+    // adjust height function
+    if (text.textArr.length*16 > height) {
+      onChange({
+        ...noteProps,
+        height: height+16,
+      });
+    }
   }, [noteProps]);
 
   useEffect(() => {
@@ -65,6 +90,7 @@ export const InputText = ({
   }
 
   const handleTextChange = (e) => {
+    console.log(e.target);
     onChange({
       ...noteProps,
       text: e.currentTarget.value,
