@@ -1,12 +1,7 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef } from "react";
 import { Group, Rect } from "react-konva";
 import { Html } from 'react-konva-utils';
-import { TextEditor } from "./Text/TextEditor";
-import { TextResizer } from "./Text/TextResizer";
 import { InputText } from "./Text/InputText";
-
-const RETURN_KEY = 13;
-const ESCAPE_KEY = 27;
 
 export function StickyNote({
   x,
@@ -21,30 +16,7 @@ export function StickyNote({
   onTextClick,
   onDelete,
 }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isTransforming, setIsTransforming] = useState(false);
-  const textRef = useRef(null);
   const delBtnRf = useRef(null);
-
-  useEffect(() => {
-    if (!isSelected && isEditing) {
-      setIsEditing(false);
-    } else if (!isSelected && isTransforming) {
-      setIsTransforming(false);
-    }
-  }, [isSelected, isEditing, isTransforming]);
-
-  function toggleEdit() {
-    setIsEditing(!isEditing);
-    setIsTransforming(!isTransforming);
-    onTextClick();
-  }
-
-  function toggleTransform() {
-    setIsTransforming(!isTransforming);
-    setIsEditing(!isEditing);
-    onTextClick();
-  }
   
   const handleCoordChange = (e) => {
     onChange({
@@ -52,27 +24,6 @@ export function StickyNote({
       x: e.target.position().x,
       y: e.target.position().y,
     });
-  }
-
-  const handleTextChange = (e) => {
-    onChange({
-      ...noteProps,
-      text: e.currentTarget.value,
-    });
-  }
-
-  const handleTextResize = (newWidth, newHeight) => {
-    onChange({
-      ...noteProps,
-      width: newWidth,
-      height: newHeight
-    });
-  }
-  
-  function handleEscapeKeys(e) {
-    if ((e.keyCode === RETURN_KEY && !e.shiftKey) || e.keyCode === ESCAPE_KEY) {
-      toggleEdit(e);
-    }
   }
 
   return (
@@ -129,45 +80,13 @@ export function StickyNote({
         x={20}
         y={40}
         text={text}
-        noteProps={noteProps}
         width={width}
-        onClick={toggleTransform}
-        onDblClick={toggleEdit}// more methods
-        visible={!isEditing && !isTransforming}
+        height={height}
+        noteProps={noteProps}
         isSelected={isSelected}
-        // fill={'#ffffff'}
-        // fontFamily={'sans-serif'}
-        // perfectDrawEnabled={false}
-        // fontSize={16}
+        onTextClick={onTextClick}
+        onChange={onChange}
       />
-      {isEditing && (
-          <TextEditor
-            x={20}
-            y={40}
-            width={width}
-            height={height}
-            value={text}
-            textNodeRef={textRef}
-            onChange={handleTextChange}
-            onKeyUp={handleEscapeKeys}
-            onKeyDown={handleEscapeKeys}
-            onBlur={() => {
-              setIsEditing(false);
-            }}
-          />
-      )}
-      {isTransforming && (
-          <TextResizer
-          x={20}
-          y={40}
-          isSelected={isTransforming}
-          onClick={toggleTransform}
-          onDoubleClick={toggleEdit}
-          onResize={handleTextResize}
-          text={text}
-          width={width}
-        />
-      )}
     </Group>
     </div>
   );
