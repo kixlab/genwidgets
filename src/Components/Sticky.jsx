@@ -38,6 +38,9 @@ export const Sticky = () => {
   const [lastTouch, setLastTouch] = useState({x:null, y:null});
   const [isEditing, setIsEditing] = useState(false);
   const [scale, setScale] = useState(1);
+
+  const layerRef = useRef(null);
+
   // for stage pan and zoom
 
   const stageRef = useRef(null);
@@ -148,7 +151,13 @@ export const Sticky = () => {
     setSelectedId(null); 
   }
 
-  useEffect(() => { console.log(notes,selectedId,scale,[...notes].filter(note => note.id === selectedId)[0])}, [notes,selectedId])
+  useEffect(() => { 
+    
+    console.log(
+    selectedId,
+    [...notes].filter(note => note.id === selectedId)[0]
+    );
+  }, [notes,selectedId])
 
       // calculate the minimum distance between nodes
   useEffect(() => {
@@ -273,6 +282,7 @@ export const Sticky = () => {
           text: 'Tap to select. Double Tap to Edit.', 
           width: 200,
           height: 200,
+          prongs: [], //prongs
         }]);
       }}}
 
@@ -285,7 +295,7 @@ export const Sticky = () => {
       // ---------------------
 
     >
-      <Layer >
+      <Layer ref={layerRef}>
       {notes.map((note, index) => {
         return(
         <StickyNote
@@ -295,9 +305,10 @@ export const Sticky = () => {
           text={note.text}
           width={note.width}
           height={note.height}
+          prongs={note.prongs}
           
           noteProps={note}
-          stageScale={scale}
+          layerRef={layerRef}
           isSelected={note.id === selectedId}
           onSelect={() => {
             setSelectedId(note.id);

@@ -1,6 +1,6 @@
 import { Text } from 'react-konva';
 import React, { useState, useEffect, useRef } from 'react';
-import { ProngImage } from './ProngImage';
+
 import { TextEditor } from "./TextEditor";
 import { TextResizer } from "./TextResizer";
 
@@ -13,7 +13,9 @@ export const InputText = ({
     text,
     width,
     height,
+    prongs,
     noteProps,
+    layerRef,
     isSelected,
     onTextClick,
     onChange
@@ -21,7 +23,6 @@ export const InputText = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isTransforming, setIsTransforming] = useState(false);
   const textRef = useRef(null);
-  const [prongInputPos, setProngInputpos] = useState([]);
 
   // change color of [[input]] using effect
   // useEffect(() => {
@@ -46,14 +47,20 @@ export const InputText = ({
   useEffect(() => {
     const text = textRef.current;
     Object.entries(text.textArr).map(([key, value]) => {
-        if (value.text.includes('[[input]]') && !prongInputPos.includes(key)) {
-            const posL = prongInputPos.slice();
+        if (value.text.includes('[[input]]') && !prongs.includes(key)) {
+            const posL = prongs.slice();
             posL.push(key);
-            setProngInputpos(posL);
-        // console.log(`${key}: ${value.text.split(' ')}`, prongInputPos.includes(key));
-        } else if (!value.text.includes('[[input]]') && prongInputPos.includes(key)) {
-            setProngInputpos(prongInputPos.filter(pos => pos !== key))
-            // console.log(prongInputPos);
+            onChange({
+              ...noteProps,
+              prongs: posL,
+            });
+        // console.log(`${key}: ${value.text.split(' ')}`, prongs.includes(key));
+        } else if (!value.text.includes('[[input]]') && prongs.includes(key)) {
+            onChange({
+              ...noteProps,
+              prongs: prongs.filter(pos => pos !== key),
+            });
+            // console.log(prongs);
         }
     });
     // adjust height function
@@ -111,6 +118,12 @@ export const InputText = ({
     }
   }
 
+  useEffect(() => { 
+    console.log(
+      layerRef.current.getIntersection({x: 50, y: 50})
+    );
+  }, [noteProps])
+
 
   return (
     <>
@@ -159,13 +172,13 @@ export const InputText = ({
           width={width}
         />
       )}
-      {prongInputPos.map((pos, index) => (
+      {/* {prongs.map((pos, index) => (
               <ProngImage 
-              y={40+pos*40} 
+              y={40+pos*40}
               key={index} 
               visible={isSelected ? false : true} 
               />
-      ))}
+      ))} */}
 </>
   );
 }
