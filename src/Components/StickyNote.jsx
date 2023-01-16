@@ -1,11 +1,8 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Group, Rect, Text } from "react-konva";
+import React, { useRef, useEffect } from "react";
+import { Group, Rect } from "react-konva";
 import { Html } from 'react-konva-utils';
-import { TextEditor } from "./TextEditor"
-import { TextResizer } from "./TextResizer";
-
-const RETURN_KEY = 13;
-const ESCAPE_KEY = 27;
+import { InputText } from "./Text/InputText";
+import { ProngImage } from './Text/ProngImage';
 
 export function StickyNote({
   x,
@@ -13,93 +10,63 @@ export function StickyNote({
   text,
   width,
   height,
+  prongs,
   noteProps,
-
+  layerRef,
   isSelected, 
   onSelect, 
   onChange,
   onTextClick,
   onDelete,
-  //isDragged,
-
-  // onDragStart,
-  // onDragEnd,
 }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isTransforming, setIsTransforming] = useState(false);
-  const textRef = useRef(null);
   const delBtnRf = useRef(null);
-  const ref = useRef(null);
-
-  // useEffect(() => {
-  //   console.log('className 👉️', ref.current.className);
-  // }, []);
-
-  useEffect(() => {
-    if (!isSelected && isEditing) {
-      setIsEditing(false);
-    } else if (!isSelected && isTransforming) {
-      setIsTransforming(false);
-    }
-  }, [isSelected, isEditing, isTransforming]);
-
-  function toggleEdit() {
-    setIsEditing(!isEditing);
-    onTextClick();
-  }
-
-  function toggleTransform() {
-    setIsTransforming(!isTransforming);
-    onTextClick();
-  }
+  const grpRef = useRef(null);
   
   const handleCoordChange = (e) => {
+    // coordinate change
     onChange({
       ...noteProps,
       x: e.target.position().x,
       y: e.target.position().y,
     });
-  }
-
-  const handleTextChange = (e) => {
-    onChange({
-      ...noteProps,
-      text: e.currentTarget.value,
-    });
-  }
-
-  const handleTextResize = (newWidth, newHeight) => {
-    onChange({
-      ...noteProps,
-      width: newWidth,
-      height: newHeight
-    });
-  }
-  
-  function handleEscapeKeys(e) {
-    if ((e.keyCode === RETURN_KEY && !e.shiftKey) || e.keyCode === ESCAPE_KEY) {
-      toggleEdit(e);
+    const bulb = e.target.children[3].getAbsolutePosition();
+    const bulbPositionShape = layerRef.current.getIntersection({x:bulb.x+10, y:bulb.y+10});
+    if (bulbPositionShape && bulbPositionShape.parent !== grpRef.current) {
+      grpRef.current.setAttr('draggable', false)
     }
+
+    console.log("onChange",
+    e.target.children[3].getAbsolutePosition(),
+    e.target.position(),
+    e.target.getAbsolutePosition(),
+    layerRef.current.getIntersection(e.target.position()),
+    layerRef.current.getIntersection(e.target.getAbsolutePosition()),
+    bulbPositionShape,
+    bulbPositionShape.parent !== grpRef.current,
+    grpRef.current
+    );
   }
-  
 
   return (
-    <div className="item" >
+    <div className="item">
     <Group
         className={"hello"}
-        ref={ref}
         x={x} 
         y={y} 
         draggable
+        ref={grpRef}
         // onDragStart={(e) => {
         //   console.log('start'+e.target.position().x);
         // }}
         onDragEnd={handleCoordChange}
+        // onDragStart={() => {
+        //   console.log('hu');
+        // }}
         >
         { isSelected &&
           <Html 
             innerRef={delBtnRf}
-            groupProps={{ x: width-40 , y: height+10}} 
+            groupProps={{ x: width-40, y: height*1.1+10 }} 
             divProps={{ style: { opacity: 0.63} }} >
             <button class="Delete-note-btn" onClick={onDelete} >Delete</button>
           </Html>
@@ -115,7 +82,9 @@ export function StickyNote({
         opacity={0.2}
         perfectDrawEnabled={false}
       /> */}
+      
       <Rect
+        className="container"
         x={isSelected ? 0 : 10}
         y={isSelected ? 0 : 20}
         width={width + 20}
@@ -132,51 +101,41 @@ export function StickyNote({
         shadowOffsetX={10}
         shadowOffsetY={10}
         onMouseOver={onSelect}
+        // do not put drag functions here
+
       />
-      <Text
+      <InputText
         x={20}
         y={40}
         text={text}
-        fill={'#ffffff'}
-        fontFamily={'sans-serif'}
-        perfectDrawEnabled={false}
-        fontSize={16}
-        ref={textRef}
         width={width}
-        onClick={toggleTransform}
-        onDblClick={toggleEdit}// more methods
-        visible={!isEditing && !isTransforming}
+        height={height}
+        prongs={prongs}
+        noteProps={noteProps}
+        layerRef={layerRef}
+        isSelected={isSelected}
+        onTextClick={onTextClick}
+        onChange={onChange}
       />
-      {isEditing && (
-          <TextEditor
-            x={20}
-            y={40}
-            value={text}
-            textNodeRef={textRef}
-            width={width}
-            height={height}
-            onChange={handleTextChange}
-            onKeyUp={handleEscapeKeys}
-            onKeyDown={handleEscapeKeys}
-            onBlur={() => {
-              setIsEditing(false);
-            }}
-            onClick={toggleTransform}
-            onDblClick={toggleEdit}
-          />
-      )}
-      {isTransforming && (
-          <TextResizer
-          x={20}
-          y={40}
-          isSelected={isTransforming}
-          onClick={toggleTransform}
-          onDoubleClick={toggleEdit}
-          onResize={handleTextResize}
-          text={text}
-          width={width}
+      {prongs.map((pos, index) => (
+        <ProngImage 
+        y={40+pos*40}
+        key={index} 
+        visible={isSelected ? false : true} 
         />
-      )}
+      ))}
+      <Rect 
+        x={width*1.2-10}
+        y={(height+20)*0.5+10}
+        width={20}
+        height={20}
+        fill={"#8900e1"}
+        cornerRadius={4}
+        perfectDrawEnabled={false}
+        opacity={1}
+        shadowColor="black"
+        visible={isSelected ? true : false} 
+      />
     </Group>
     </div>
   );

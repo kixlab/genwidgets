@@ -37,6 +37,9 @@ export const Sticky = () => {
   const [clipboardNote, setClipboardNote] = useState(null);
   const [lastTouch, setLastTouch] = useState({x:null, y:null});
   const [isEditing, setIsEditing] = useState(false);
+  const [scale, setScale] = useState(1);
+
+  const layerRef = useRef(null);
 
   // for stage pan and zoom
 
@@ -55,6 +58,8 @@ export const Sticky = () => {
         y: (pointerY - stage.y()) / oldScale,
       };
       const newScale = event.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+      setScale(newScale);
+
       stage.scale({ x: newScale, y: newScale });
       const newPos = {
         x: pointerX - mousePointTo.x * newScale,
@@ -104,7 +109,7 @@ export const Sticky = () => {
         };
   
         var scale = stage.scaleX() * (dist / lastDist);
-  
+        setScale(scale);
         stage.scaleX(scale);
         stage.scaleY(scale);
   
@@ -133,21 +138,6 @@ export const Sticky = () => {
 
   //* --- for stage pan and zoom ends --- */ 
 
-  // const handleDragStart = (event) => {
-  //   const target = event.target;
-  //   setDraggedItem(target);
-  // };
-
-  // const handleDragEnd = (event) => {
-  //   const target = event.target;
-  //   if (draggedItem && target) {
-  //       const text1 = draggedItem.value || '';
-  //       const text2 = target.value || '';
-  //       target.value = text2 + ' and ' + text1;
-  //       draggedItem = null
-  //     }
-  //   setDraggedItem(null);
-  // };
 
   useEffect(() => {
     if (selectedId !== null) {
@@ -156,23 +146,18 @@ export const Sticky = () => {
     } 
   }, [notes]);
 
-  function handleAddClick() {
-    setNotes([...notes, { 
-      id: newid.current++,
-      x: 100, 
-      y: 100, 
-      text: 'Tap to select. Double Tap to Edit.', 
-      width: 200,
-      height: 200,
-    }]);
-  }
-
   const handleDeleteClick = () => {
     setNotes(notes.filter((note) => note.id!== selectedId));
     setSelectedId(null); 
   }
 
-  useEffect(() => { console.log(notes,selectedId,[...notes].filter(note => note.id === selectedId)[0])}, [notes,selectedId])
+  useEffect(() => { 
+    
+    console.log(
+    selectedId,
+    [...notes].filter(note => note.id === selectedId)[0]
+    );
+  }, [notes,selectedId])
 
       // calculate the minimum distance between nodes
   useEffect(() => {
@@ -230,6 +215,7 @@ export const Sticky = () => {
 
 
   const DELETE_KEY = 46;
+  const BACKSPACE = 8;
 
   const handleKeyDown = (event)=>{
     // console.log(event)
@@ -243,7 +229,7 @@ export const Sticky = () => {
     }else if((event.ctrlKey || event.metaKey) && charCode === 'x' && selectedId !== null) {
       setClipboardNote([...notes].filter(note => note.id === selectedId)[0]);
       handleDeleteClick();
-    }else if((event.keyCode === DELETE_KEY || event.metaKey) && selectedId !== null) {
+    }else if((event.keyCode === DELETE_KEY || event.keyCode === BACKSPACE || event.metaKey) && selectedId !== null) {
       handleDeleteClick();
     }else if((event.ctrlKey || event.metaKey) && charCode === 'v') {
       setNotes([...notes, { 
@@ -280,8 +266,6 @@ export const Sticky = () => {
       <p>
         Double tap on canvas to add text. Pan and zoom canvas as needed.
       </p>
-    {/* <button class="Add-note-btn" onClick={handleAddClick}>Add Note</button>
-    &nbsp; */}
     <button class="Concat-note-btn" onClick={handleConcatClick}>Concat Near</button>
     <Stage
       width={window.innerWidth}
@@ -298,6 +282,7 @@ export const Sticky = () => {
           text: 'Tap to select. Double Tap to Edit.', 
           width: 200,
           height: 200,
+          prongs: [], //prongs
         }]);
       }}}
 
@@ -310,7 +295,7 @@ export const Sticky = () => {
       // ---------------------
 
     >
-      <Layer >
+      <Layer ref={layerRef}>
       {notes.map((note, index) => {
         return(
         <StickyNote
@@ -320,8 +305,10 @@ export const Sticky = () => {
           text={note.text}
           width={note.width}
           height={note.height}
+          prongs={note.prongs}
           
           noteProps={note}
+          layerRef={layerRef}
           isSelected={note.id === selectedId}
           onSelect={() => {
             setSelectedId(note.id);
@@ -337,15 +324,6 @@ export const Sticky = () => {
             setIsEditing(true);
           }}
           onDelete={handleDeleteClick}
-          // isDragged={note.id = draggedId}
-          // onDragStart={() => {
-          //   setDraggedItem(note.id);
-          // }}
-          // onDragEnd={() => {
-          //   setDraggedItem(null);
-          // }}
-          // onDragStart={handleDragStart}
-          // onDragEnd={handleDragEnd}
         />
         );
       })}

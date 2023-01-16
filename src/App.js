@@ -1,7 +1,6 @@
 import './App.css';
 import * as React from 'react';
-// import DragAndDrop from './Components/DragAndDrop';
-// import MyComponent from './Components/Canvas'
+// import myCanvas from './Components/Rectangles';
 import { Sticky } from './Components/Sticky';
 
 

@@ -1,17 +1,39 @@
 import React from 'react';
 import { Html } from 'react-konva-utils';
 
+// function getStyle(width, height) {
+//   const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+//   const baseStyle = {
+//     width: `${width}px`,
+//     height: `${height}px`,
+//     border: "none",
+//     padding: "0px",
+//     margin: "0px",
+//     background: "none",
+//     outline: "none",
+//     resize: "none",
+//     colour: "#ffffff",
+//     fontSize: "16px",
+//     fontFamily: "sans-serif"
+//   };
+//   if (isFirefox) {
+//     return baseStyle;
+//   }
+//   return {
+//     ...baseStyle,
+//     margintop: "-4px"
+//   };
+// }
+
 export const TextEditor = ({
   x,
   y,
   textNodeRef,
-  value,
-  onBlur,
+  value, 
   onChange,
   onKeyDown,
   onKeyUp,
-  onClick,
-  onDoubleClick
+  onBlur
 }) => {
   const [style, setStyle] = React.useState();
   React.useLayoutEffect(() => {
@@ -30,7 +52,7 @@ export const TextEditor = ({
     newStyle.outline = 'none';
     newStyle.resize = 'none';
     newStyle.lineHeight = textNode.lineHeight() + 0.01;
-    newStyle.fontFamily = textNode.fontFamily();
+    newStyle.fontFamily = `${textNode.fontFamily()}`;
     newStyle.transformOrigin = 'left top';
     newStyle.textAlign = textNode.align();
     newStyle.color = textNode.fill();
@@ -42,28 +64,19 @@ export const TextEditor = ({
     if (JSON.stringify(newStyle) !== JSON.stringify(style)) {
       setStyle(newStyle);
     }
-  });
-  // React.useEffect((e) => {
-  //   onChange({
-  //     ...textProps,
-  //     text: e.currentTarget.value,
-  //   });
-  // });
+  }, [textNodeRef,style]); //racebugs
+  // const style = getStyle(width, height);
 
   return (
-    <Html groupProps={{ x, y }} divProps={{ style: { opacity: 0.83 } }}>
+    <Html groupProps={{ x, y }} divProps={{ style: { opacity: 1 } }}>
       <textarea
         className="polotno-input"
-        style={{
-          ...style,
-        }}
+        style={{...style}}
         value={value}
         onChange={onChange}
         onKeyDown={onKeyDown}
         onKeyUp={onKeyUp}
         onBlur={onBlur}
-        onClick={onClick}
-        onDoubleClick={onDoubleClick}
       />
     </Html>
   );
