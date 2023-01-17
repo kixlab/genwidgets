@@ -1,14 +1,21 @@
 import React from "react";
-import { Rect } from "react-konva";
+import { Rect, Text } from "react-konva";
 
-export const ProngTextBox = () => {
+export const ProngTextBox = ({
+    x,
+    y,
+    width,
+    height,
+    text
+}) => {
     return (
+        <>
         <Rect
-        className="container"
-        x={-10}
-        y={-20}
-        width={200}
-        height={100}
+        className="prong-text-box"
+        x={x}
+        y={y}
+        width={width}
+        height={height}
         fill={"#8900e1"}
         cornerRadius={4}
         perfectDrawEnabled={false}
@@ -20,5 +27,18 @@ export const ProngTextBox = () => {
         shadowOffsetY={10}
         // do not put drag functions here
       />
+      <Text
+        x={x+10}
+        y={y+20}
+        text={text}
+        width={width-20}
+        height={height-10}
+
+        fill={'#ffffff'}
+        fontFamily={'sans-serif'}
+        perfectDrawEnabled={false}
+        fontSize={16}
+      />      
+</>
     );
 }
