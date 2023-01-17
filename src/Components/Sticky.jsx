@@ -154,10 +154,19 @@ export const Sticky = () => {
   useEffect(() => { 
     
     console.log(
+    "selectedId",
     selectedId,
-    [...notes].filter(note => note.id === selectedId)[0]
+    [...notes].filter(note => note.id === selectedId)[0],
+    // [...notes].filter(note => note.prongs.length === 0), //prong node
+    // [...notes].filter(note => note.prongs.length !== 0)
     );
   }, [notes,selectedId])
+
+  // useEffect(() => { 
+  //   const prongNotes = ;
+  //   const nonProngNotes = ;
+  //   setNotes(nonProngNotes.concat(prongNotes));
+  // }, [notes,selectedId])
 
       // calculate the minimum distance between nodes
   useEffect(() => {

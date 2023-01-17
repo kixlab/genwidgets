@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { Group, Rect } from "react-konva";
 import { Html } from 'react-konva-utils';
 import { InputText } from "./Text/InputText";
-import { ProngImage } from './Text/ProngImage';
+import { ProngImage } from './Prong/ProngImage';
 
 export function StickyNote({
   x,
@@ -29,20 +29,26 @@ export function StickyNote({
       x: e.target.position().x,
       y: e.target.position().y,
     });
-    const bulb = e.target.children[3].getAbsolutePosition();
+    //check if there is anything on the bulb
+    const bulb = e.target.children.filter(
+      child => child.getAttrs().className === "bulb" 
+      )[0].getAbsolutePosition();
     const bulbPositionShape = layerRef.current.getIntersection({x:bulb.x+10, y:bulb.y+10});
-    if (bulbPositionShape && bulbPositionShape.parent !== grpRef.current) {
-      grpRef.current.setAttr('draggable', false)
+    if (bulbPositionShape.getAttrs().className === 'prong') {
+      console.log('Image', bulbPositionShape.parent);
+      // bulbPositionShape.parent.add(<Rect x={0} y={0} width={20} height={20} fill={"black"}/>);
+      console.log(bulbPositionShape.parent);
+      // grpRef.current.setAttr('draggable', false)
     }
 
     console.log("onChange",
-    e.target.children[3].getAbsolutePosition(),
-    e.target.position(),
-    e.target.getAbsolutePosition(),
-    layerRef.current.getIntersection(e.target.position()),
-    layerRef.current.getIntersection(e.target.getAbsolutePosition()),
-    bulbPositionShape,
-    bulbPositionShape.parent !== grpRef.current,
+    //...e.target.children.filter(child => child.getAttrs().className === "bulb"),
+    // e.target.position(),
+    // e.target.getAbsolutePosition(),
+    // layerRef.current.getIntersection(e.target.position()),
+    // layerRef.current.getIntersection(e.target.getAbsolutePosition()),
+//    bulbPositionShape.className,
+//    bulbPositionShape.parent !== grpRef.current,
     grpRef.current
     );
   }
@@ -65,6 +71,7 @@ export function StickyNote({
         >
         { isSelected &&
           <Html 
+            class={"button"}
             innerRef={delBtnRf}
             groupProps={{ x: width-40, y: height*1.1+10 }} 
             divProps={{ style: { opacity: 0.63} }} >
@@ -102,7 +109,6 @@ export function StickyNote({
         shadowOffsetY={10}
         onMouseOver={onSelect}
         // do not put drag functions here
-
       />
       <InputText
         x={20}
@@ -119,12 +125,13 @@ export function StickyNote({
       />
       {prongs.map((pos, index) => (
         <ProngImage 
-        y={40+pos*40}
+        y={40+pos.position*40}
         key={index} 
         visible={isSelected ? false : true} 
         />
       ))}
       <Rect 
+        className={"bulb"}
         x={width*1.2-10}
         y={(height+20)*0.5+10}
         width={20}
