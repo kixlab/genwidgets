@@ -59,7 +59,7 @@ export const InputText = ({
         } else if (!value.text.includes('[[input]]') && prongPos.includes(key)) {
             onChange({
               ...noteProps,
-              prongs: prongs.filter(pos => pos !== key),
+              prongs: prongs.filter(obj => obj.position !== key),
             });
             // console.log(prongs);
         }

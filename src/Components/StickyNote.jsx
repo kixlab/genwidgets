@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 import { Group, Rect } from "react-konva";
 import { Html } from 'react-konva-utils';
 import { InputText } from "./Text/InputText";
-import { ProngImage } from './Prong/ProngImage';
+import { Prong } from './Prong/Prong';
 
 export function StickyNote({
   x,
@@ -16,11 +16,20 @@ export function StickyNote({
   isSelected, 
   onSelect, 
   onChange,
+  onReplace,
+  onFilter,
   onTextClick,
   onDelete,
 }) {
   const delBtnRf = useRef(null);
   const grpRef = useRef(null);
+
+  const encodePosition = (key) => {
+    return (40*key)+40
+  }
+  const decodePosition = (pos) => {
+    return 0.025*(pos-40)
+  }
   
   const handleCoordChange = (e) => {
     // coordinate change
@@ -29,21 +38,10 @@ export function StickyNote({
       x: e.target.position().x,
       y: e.target.position().y,
     });
-    //check if there is anything on the bulb
-    const bulb = e.target.children.filter(
-      child => child.getAttrs().className === "bulb" 
-      )[0].getAbsolutePosition();
-    const bulbPositionShape = layerRef.current.getIntersection({x:bulb.x+10, y:bulb.y+10});
-    if (bulbPositionShape.getAttrs().className === 'prong') {
-      console.log('Image', bulbPositionShape.parent);
-      // bulbPositionShape.parent.add(<Rect x={0} y={0} width={20} height={20} fill={"black"}/>);
-      console.log(bulbPositionShape.parent);
-      // grpRef.current.setAttr('draggable', false)
-    }
 
     console.log("onChange",
     //...e.target.children.filter(child => child.getAttrs().className === "bulb"),
-    // e.target.position(),
+    e.target,
     // e.target.getAbsolutePosition(),
     // layerRef.current.getIntersection(e.target.position()),
     // layerRef.current.getIntersection(e.target.getAbsolutePosition()),
@@ -51,14 +49,49 @@ export function StickyNote({
 //    bulbPositionShape.parent !== grpRef.current,
     grpRef.current
     );
+
+    //check if there is anything on the bulb
+    const bulb = e.target.children.filter(
+      child => child.getAttrs().className === "bulb" 
+      )[0].getAbsolutePosition();
+    const bulbPositionShape = layerRef.current.getIntersection({x:bulb.x+10, y:bulb.y+10});
+    if (bulbPositionShape.getAttrs().className === 'prong') {
+      console.log('Image', bulbPositionShape.parent.getAttrs().noteProps, grpRef.current);
+      const bulbShapeProps = bulbPositionShape.parent.getAttrs().noteProps;
+      const prongPos = decodePosition(bulbPositionShape.getAttrs().y);
+      
+      const newProngs = bulbShapeProps.prongs.map(obj => {
+        if (obj.position === prongPos.toString()) {
+          return {position: prongPos.toString(), text:text};
+        } else {
+          return obj;
+        }
+      });
+      //console.log("nps", newProngs)
+      //console.log("current group",grpRef.current);
+      onReplace({...bulbShapeProps, prongs:newProngs});
+      
+      //console.log("bulb parnet", bulbPositionShape.parent);
+      //console.log("current group",grpRef.current, noteProps);
+
+      // setTimeout(() => {
+      // onFilter(noteProps);
+      // console.log("current group",grpRef.current);
+      // }, 6000); // setnotes is slow
+
+      // bulbPositionShape.parent.add(<Rect x={0} y={0} width={20} height={20} fill={"black"}/>);
+      
+      // grpRef.current.setAttr('draggable', false)
+    }
   }
 
   return (
     <div className="item">
     <Group
-        className={"hello"}
+        className={"text component"}
         x={x} 
         y={y} 
+        noteProps={noteProps}
         draggable
         ref={grpRef}
         // onDragStart={(e) => {
@@ -123,10 +156,11 @@ export function StickyNote({
         onTextClick={onTextClick}
         onChange={onChange}
       />
-      {prongs.map((pos, index) => (
-        <ProngImage 
-        y={40+pos.position*40}
+      {prongs.map((prong, index) => (
+        <Prong
+        y={encodePosition(prong.position)}
         key={index} 
+        text={prong.text}
         visible={isSelected ? false : true} 
         />
       ))}
