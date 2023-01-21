@@ -69,7 +69,7 @@ export function StickyNote({
       });
       //console.log("nps", newProngs)
       //console.log("current group",grpRef.current);
-      onReplace({...bulbShapeProps, prongs:newProngs});
+      onReplace({...bulbShapeProps, text: bulbShapeProps.text.replace("[[input]]", text), prongs:newProngs});
       
       //console.log("bulb parnet", bulbPositionShape.parent);
       //console.log("current group",grpRef.current, noteProps);
