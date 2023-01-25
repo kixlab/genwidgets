@@ -139,12 +139,13 @@ export const Sticky = () => {
   //* --- for stage pan and zoom ends --- */ 
 
 
-  useEffect(() => {
-    if (selectedId !== null) {
-      let selectNote = [...notes].filter(note => note.id === selectedId)[0]
-      setLastTouch({x:selectNote.x+30, y:selectNote.y+30})
-    } 
-  }, [notes]);
+  // useEffect(() => {
+  //   if (selectedId !== null) {
+  //     const selectNote = [...notes].filter(note => note.id === selectedId)[0]
+  //     setLastTouch({x:selectNote.x+30, y:selectNote.y+30})
+  //     console.log("busted")
+  //   } 
+  // }, [notes]);
 
   const handleDeleteClick = () => {
     setNotes(notes.filter((note) => note.id!== selectedId));
@@ -154,42 +155,45 @@ export const Sticky = () => {
   useEffect(() => { 
     
     console.log(
-    selectedId,
-    [...notes].filter(note => note.id === selectedId)[0]
+    "selectedId",
+    notes
+    // [...notes].filter(note => note.id === selectedId)[0],
+    // [...notes].filter(note => note.prongs.length === 0), //prong node
+    // [...notes].filter(note => note.prongs.length !== 0)
     );
   }, [notes,selectedId])
 
       // calculate the minimum distance between nodes
-  useEffect(() => {
-    if (notes.length > 1) {
-      // use the Pythagorean theorem to calculate the distance between each pair of nodes
-      const notesCopy = [...notes]
-      const distances = notesCopy.map((note1, index1) => {
-        return notesCopy.slice(index1 + 1).map((note2, index2) => {
-          const a = note2.x - note1.x;
-          const b = note2.y - note1.y;
-          return {
-            distance: Math.sqrt(a * a + b * b),
-            nodes: [note1, note2]
-          };
-        });
-      });
+  // useEffect(() => {
+  //   if (notes.length > 1) {
+  //     // use the Pythagorean theorem to calculate the distance between each pair of nodes
+  //     const notesCopy = [...notes]
+  //     const distances = notesCopy.map((note1, index1) => {
+  //       return notesCopy.slice(index1 + 1).map((note2, index2) => {
+  //         const a = note2.x - note1.x;
+  //         const b = note2.y - note1.y;
+  //         return {
+  //           distance: Math.sqrt(a * a + b * b),
+  //           nodes: [note1, note2]
+  //         };
+  //       });
+  //     });
 
-      // flatten the distances array
-      const flatDistances = distances.reduce((acc, val) => acc.concat(val), []);
+  //     // flatten the distances array
+  //     const flatDistances = distances.reduce((acc, val) => acc.concat(val), []);
 
-      // find the minimum distance and the nodes that have the minimum distance
-      const minDistance = flatDistances.reduce((min, { distance, nodes }) => {
-        if (distance < min.distance) {
-          return { distance, nodes };
-        } else {
-          return min;
-        }
-      }, flatDistances[0]);
-
-      setMinDistance(minDistance);
-    }
-  }, [notes]);
+  //     // find the minimum distance and the nodes that have the minimum distance
+  //     const minDistance = flatDistances.reduce((min, { distance, nodes }) => {
+  //       if (distance < min.distance) {
+  //         return { distance, nodes };
+  //       } else {
+  //         return min;
+  //       }
+  //     }, flatDistances[0]);
+  //     console.log("confirm")
+  //     setMinDistance(minDistance);
+  //   }
+  // }, [notes]);
 
   // this can be made cheaper
   // concatonates nodes to the oldest and nearest node
@@ -241,6 +245,25 @@ export const Sticky = () => {
       }]);
     }}
   }
+  
+  // change some attr(s) of a note and put the new note in here
+  const replaceNote = (newNote) => {
+    // const newNotes = notes.filter((note) => note.id!== newNote.id);
+    // use timeout to fix timing issues
+    setTimeout(() => {
+      setNotes([...notes].map(note => {
+        if (note.id === newNote.id) {
+          return newNote;
+        } else {
+          return note;
+        }
+      }));
+    }, 100); // setnotes is slow
+    setSelectedId(null); //
+  setTimeout(() => {
+    console.log("This is the note after replacemnt",notes);
+  }, 1000); // setnotes is slow
+  };
 
   const checkDeselect = (e) => {
     // deselect when clicked on empty area
@@ -313,11 +336,20 @@ export const Sticky = () => {
           onSelect={() => {
             setSelectedId(note.id);
             setIsEditing(false);
+            setLastTouch({x:note.x+30, y:note.y+30})
           }}
           onChange={(newAttrs) => {
             const nwNotes = notes.slice();
             nwNotes[index] = newAttrs;
             setNotes(nwNotes);
+          }}
+          onReplace={replaceNote} // on change but stronger
+          onFilter={(note) => {
+            console.log("This note state before filter",notes);
+            setTimeout(() => {
+            setNotes([...notes].filter(nt => nt.id !== note.id));
+          }, 100); // setnotes is slow
+            console.log("This note state after filter",notes);
           }}
           onTextClick={() => {
             setSelectedId(note.id);

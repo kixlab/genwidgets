@@ -47,18 +47,19 @@ export const InputText = ({
   useEffect(() => {
     const text = textRef.current;
     Object.entries(text.textArr).map(([key, value]) => {
-        if (value.text.includes('[[input]]') && !prongs.includes(key)) {
+        const prongPos = prongs.map(obj => obj.position)
+        if (value.text.includes('[[input]]') && !prongPos.includes(key)) {
             const posL = prongs.slice();
-            posL.push(key);
+            posL.push({position:key, text:''});
             onChange({
               ...noteProps,
               prongs: posL,
             });
         // console.log(`${key}: ${value.text.split(' ')}`, prongs.includes(key));
-        } else if (!value.text.includes('[[input]]') && prongs.includes(key)) {
+        } else if (!value.text.includes('[[input]]') && prongPos.includes(key)) {
             onChange({
               ...noteProps,
-              prongs: prongs.filter(pos => pos !== key),
+              prongs: prongs.filter(obj => obj.position !== key),
             });
             // console.log(prongs);
         }
@@ -81,7 +82,7 @@ export const InputText = ({
     if (isEditing && isTransforming) {
       setIsTransforming(false);
     }
-    console.log("isEditing",isEditing,"isTransforming",isTransforming)
+    // console.log("isEditing",isEditing,"isTransforming",isTransforming)
   }, [isSelected, isEditing, isTransforming]);
 
   function toggleEdit() {
@@ -97,7 +98,7 @@ export const InputText = ({
   }
 
   const handleTextChange = (e) => {
-    console.log(e.target);
+  //  console.log(e.target);
     onChange({
       ...noteProps,
       text: e.currentTarget.value,
@@ -118,11 +119,11 @@ export const InputText = ({
     }
   }
 
-  useEffect(() => { 
-    console.log(
-      layerRef.current.getIntersection({x: 50, y: 50})
-    );
-  }, [noteProps])
+  // useEffect(() => { 
+  //   console.log(
+  //     layerRef.current.getIntersection({x: 50, y: 50})
+  //   );
+  // }, [noteProps])
 
 
   return (
