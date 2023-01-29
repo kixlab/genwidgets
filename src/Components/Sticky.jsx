@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Stage, Layer } from "react-konva";
+import { Rect, Stage, Layer } from "react-konva";
 import { StickyNote } from "./StickyNote";
 
 const JOIN_DIST = 300;
@@ -40,6 +40,8 @@ export const Sticky = () => {
   const [scale, setScale] = useState(1);
 
   const layerRef = useRef(null);
+
+  const engineRef = useRef(null);
 
   // for stage pan and zoom
 
@@ -306,6 +308,7 @@ export const Sticky = () => {
           width: 200,
           height: 200,
           prongs: [], //prongs
+          engines: []
         }]);
       }}}
 
@@ -318,6 +321,7 @@ export const Sticky = () => {
       // ---------------------
 
     >
+      
       <Layer ref={layerRef}>
       {notes.map((note, index) => {
         return(
@@ -329,6 +333,7 @@ export const Sticky = () => {
           width={note.width}
           height={note.height}
           prongs={note.prongs}
+          engines={note.engines}
           
           noteProps={note}
           layerRef={layerRef}
@@ -359,6 +364,30 @@ export const Sticky = () => {
         />
         );
       })}
+      </Layer>
+      <Layer>
+        <Rect
+        name="dragging-engine"
+        x={0}
+        y={0}
+        width={96}
+        height={96}
+        fill="red"
+        ref={engineRef}
+        draggable
+        onDragStart={(e) => {
+          console.log(engineRef.current, layerRef.current);
+          layerRef.current.add(engineRef.current);
+          }
+        }
+        onDragEnd={(e) => {
+          console.log(layerRef.current.getIntersection(e.target.position()).name(),e.target.position());
+          if (layerRef.current.getIntersection(e.target.position()).name() !== "dragging-engine") {
+            console.log(layerRef.current.getIntersection(e.target.position()).getParent(),e.target.position());
+          }
+          }
+        }
+        />
       </Layer>
     </Stage>
     </div>

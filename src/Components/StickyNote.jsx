@@ -11,6 +11,7 @@ export function StickyNote({
   width,
   height,
   prongs,
+  engines,
   noteProps,
   layerRef,
   isSelected, 
@@ -88,7 +89,7 @@ export function StickyNote({
   return (
     <div className="item">
     <Group
-        className={"text component"}
+        name={"text component"}
         x={x} 
         y={y} 
         noteProps={noteProps}
@@ -102,6 +103,21 @@ export function StickyNote({
         //   console.log('hu');
         // }}
         >
+        <Rect
+          x={-10}
+          y={-10}
+          width={width + 150}
+          height={height + 80}
+          fill={"#d3d3d3"}
+          cornerRadius={4}
+          perfectDrawEnabled={false}
+          opacity={0.42}
+          shadowColor="black"
+          shadowBlur={10}
+          shadowOpacity={0.3}
+          shadowOffsetX={10}
+          shadowOffsetY={10}
+        />
         { isSelected &&
           <Html 
             class={"button"}
@@ -177,6 +193,7 @@ export function StickyNote({
         shadowColor="black"
         visible={isSelected ? true : false} 
       />
+      
     </Group>
     </div>
   );
