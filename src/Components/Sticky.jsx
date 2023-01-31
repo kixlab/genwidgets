@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Rect, Stage, Layer } from "react-konva";
 import { StickyNote } from "./StickyNote";
+import axios from 'axios';
 
 const JOIN_DIST = 300;
 
@@ -152,6 +153,12 @@ export const Sticky = () => {
   const handleDeleteClick = () => {
     setNotes(notes.filter((note) => note.id!== selectedId));
     setSelectedId(null); 
+    // const data = { prompt: [...notes].filter(note => note.id === selectedId)[0].text }
+    //   axios
+    //   .post(`http://localhost:8080/api/generate`, data)
+    //   .then((response) => {
+    //     console.log(response)
+    // });
   }
 
   useEffect(() => { 
@@ -219,6 +226,31 @@ export const Sticky = () => {
     }
   }
 
+  const handleGenerateClick = (e) => {
+    e.preventDefault();
+    const selectNote = [...notes].filter(note => note.id === selectedId)[0]
+    const data = { prompt: selectNote.text }
+    axios
+    .post(`http://localhost:8080/api/generate`, data)
+    .then((response) => {
+      console.log(response.data)
+      if (response.data.success) {
+        setNotes([...notes, { 
+        x: 200,
+        y: 200,
+        id: newid.current++,
+        text: response.data.generations[0], 
+        width: 200,
+        height: 200,
+        prongs: [], //prongs
+        engines: []
+      }]);
+      }
+
+    });
+    
+  }
+
 
   const DELETE_KEY = 46;
   const BACKSPACE = 8;
@@ -244,8 +276,10 @@ export const Sticky = () => {
         ...lastTouch
         // x: clipboardNote.x + 30,
         // y: clipboardNote.y + 30
-      }]);
-    }}
+      }
+    ]);
+    }
+  }
   }
   
   // change some attr(s) of a note and put the new note in here
@@ -284,10 +318,12 @@ export const Sticky = () => {
       onKeyDown={handleKeyDown}
       >
       <aside><h1>Genwidgets</h1></aside>
-      <p>
+      
+            
+      {/* <p>
         Minimum distance between nodes:{" "}
         {minDistance.nodes.map(node => node.id).join(", ")} ({minDistance.distance})
-      </p>
+      </p> */}
       <p>
         Double tap on canvas to add text. Pan and zoom canvas as needed.
       </p>
@@ -361,6 +397,7 @@ export const Sticky = () => {
             setIsEditing(true);
           }}
           onDelete={handleDeleteClick}
+          onGenerate={handleGenerateClick}
         />
         );
       })}

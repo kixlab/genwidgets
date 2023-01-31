@@ -19,12 +19,16 @@ export function StickyNote({
   isSelected, 
   onSelect, 
   onChange,
+  onGenerate,
+
   onReplace,
   onFilter,
+  
   onTextClick,
   onDelete,
 }) {
   const delBtnRf = useRef(null);
+  const genBtnRf = useRef(null);
   const grpRef = useRef(null);
 
   const encodePosition = (key) => {
@@ -117,6 +121,15 @@ export function StickyNote({
             groupProps={{ x: width-40, y: height*1.1+10 }} 
             divProps={{ style: { opacity: 0.63} }} >
             <button class="Delete-note-btn" onClick={onDelete} >Delete</button>
+          </Html>
+        }
+        { isSelected &&
+          <Html 
+            class={"button"}
+            innerRef={genBtnRf}
+            groupProps={{ x: width-140, y: height*1.1+10 }} 
+            divProps={{ style: { opacity: 0.63} }} >
+            <button class="Delete-note-btn" onClick={onGenerate} >Generate</button>
           </Html>
         }
       {/* <Rect

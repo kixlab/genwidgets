@@ -10,7 +10,6 @@ export const EngineSkeleton = ({
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const textRef = useRef(null);
-    const rectangleRef = useRef(null);
 
     const boxSize = engineSize;
 
@@ -22,10 +21,11 @@ export const EngineSkeleton = ({
         { x: 3*boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Top-N', text: 'Box 2' }
       ]);
 
-      const handleTextChange = (index, text) => {
-        const newBoxes = [...boxes];
-        newBoxes[index].text = text;
-        setBoxes(newBoxes);
+      const handleTextChange = (e) => {
+        console.log("baby", e.target.value);
+        // const newBoxes = [...boxes];
+        // newBoxes[index].text = e.currentTarget.value;
+        // setBoxes(newBoxes);
       };
 
       function toggleEdit() {
@@ -97,7 +97,6 @@ export const EngineSkeleton = ({
               width={smallBoxSize*0.9}
               height={smallBoxSize*0.4}
               fill="#00D1B2"
-              ref={rectangleRef}
               cornerRadius={4}
               perfectDrawEnabled={false}
             />
