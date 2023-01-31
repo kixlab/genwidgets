@@ -3,6 +3,8 @@ import { Group, Rect } from "react-konva";
 import { Html } from 'react-konva-utils';
 import { InputText } from "./Text/InputText";
 import { Prong } from './Prong/Prong';
+import { EngineContainer } from "./Pipeline/EngineContainer";
+
 
 export function StickyNote({
   x,
@@ -103,20 +105,10 @@ export function StickyNote({
         //   console.log('hu');
         // }}
         >
-        <Rect
-          x={-10}
-          y={-10}
-          width={width + 150}
-          height={height + 80}
-          fill={"#d3d3d3"}
-          cornerRadius={4}
-          perfectDrawEnabled={false}
-          opacity={0.42}
-          shadowColor="black"
-          shadowBlur={10}
-          shadowOpacity={0.3}
-          shadowOffsetX={10}
-          shadowOffsetY={10}
+        <EngineContainer 
+        width={width}
+        height={height}
+        engineSize={100}
         />
         { isSelected &&
           <Html 

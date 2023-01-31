@@ -1,33 +1,46 @@
-import React, { useState } from 'react';
-import { Stage, Layer, Rect, Text } from 'react-konva';
-import TextEditor from '../Text/TextEditor'
+import React, { useState, useRef } from 'react';
+import { Rect, Text, Group } from 'react-konva';
+import { TextEditor } from '../Text/TextEditor'
 
 
 export const EngineSkeleton = ({
     x,
     y,
-    width,
-    height,
-    text
+    engineSize,
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const textRef = useRef(null);
+    const rectangleRef = useRef(null);
 
-    const boxSize = useState(100);
+    const boxSize = engineSize;
 
-    const smallBoxSize = (boxSize/2)*0.8
+    const smallBoxSize = (boxSize/2)*0.9
     const [boxes, setBoxes] = useState([
-        { x: boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, width: smallBoxSize, height: smallBoxSize, text: 'Box 1' },
-        { x: boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, width: smallBoxSize, height: smallBoxSize, text: 'Box 2' },
-        { x: 3*boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, width: smallBoxSize, height: smallBoxSize, text: 'Box 1' },
-        { x: 3*boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, width: smallBoxSize, height: smallBoxSize, text: 'Box 2' }
+        { x: boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, data: 'Engine', text: 'Box 1' },
+        { x: boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Temp', text: 'Box 2' },
+        { x: 3*boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, data: 'Presence', text: 'Box 1' },
+        { x: 3*boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Top-N', text: 'Box 2' }
       ]);
 
+      const handleTextChange = (index, text) => {
+        const newBoxes = [...boxes];
+        newBoxes[index].text = text;
+        setBoxes(newBoxes);
+      };
+
+      function toggleEdit() {
+        setIsEditing(true);
+      }
+    
+
     return (
-        <>
-        <Rect
+        <Group
         x={x}
         y={y}
+        >
+        <Rect
+        x={0}
+        y={0}
         width={boxSize}
         height={boxSize}
         fill={"#4D94FF"}
@@ -39,87 +52,73 @@ export const EngineSkeleton = ({
             <Rect
               x={box.x}
               y={box.y}
-              width={box.width}
-              height={box.height}
-              fill="#666666"
+              width={smallBoxSize}
+              height={smallBoxSize}
+              fill="#ffffff"
               cornerRadius={4}
               perfectDrawEnabled={false}
             />
             <Text
-              x={box.x + box.width / 2}
-              y={box.y + box.height / 2}
-              text={box.text}
-              onChange={(e) => handleTextChange(index, e.target.text)}
+                x={box.x}
+                y={box.y + 2.5*smallBoxSize / 4}
+                width={smallBoxSize}
+                height={smallBoxSize}
+
+                ref={textRef}
+                text={box.text}
+                onDblClick={toggleEdit}
+                onDblTap={toggleEdit}// more methods
+                visible={!isEditing}
+
+                fill={'#0a0a0a'}
+                fontFamily={'sans-serif'}
+                align={'center'}
+                perfectDrawEnabled={false}
+                fontSize={10}
             />
             {isEditing && (
                 <TextEditor
-                    x={x}
-                    y={y}
-                    width={width}
-                    height={height}
-                    value={text}
+                    x={box.x }
+                    y={box.y + 2.5*smallBoxSize / 4}
+                    width={smallBoxSize}
+                    height={smallBoxSize}
+                    value={box.text}
                     textNodeRef={textRef}
                     onChange={handleTextChange}
-                    onKeyDown={handleEscapeKeys}
+                    //onKeyDown={handleEscapeKeys}
                     onBlur={() => {
                     setIsEditing(false);
                     }}
                 />
             )}
+            <Rect
+              x={box.x+smallBoxSize*0.05}
+              y={box.y+smallBoxSize*0.05}
+              width={smallBoxSize*0.9}
+              height={smallBoxSize*0.4}
+              fill="#00D1B2"
+              ref={rectangleRef}
+              cornerRadius={4}
+              perfectDrawEnabled={false}
+            />
+            <Text
+                text={box.data}
+                x={box.x+smallBoxSize*0.05}
+                y={box.y+smallBoxSize*0.05}
+                width={smallBoxSize*0.9}
+                height={smallBoxSize*0.4}
+                fontStyle="bold"
+                fontFamily='sans-serif'
+                fill="#ffffff"
+                fontSize={8}
+                align="center"
+                verticalAlign="middle"
+            />
           </React.Fragment>
-        ))}
-      <Text
-        x={x+10}
-        y={y+20}
-        text={text}
-        width={width-20}
-        height={height-10}
-
-        fill={'#ffffff'}
-        fontFamily={'sans-serif'}
-        perfectDrawEnabled={false}
-        fontSize={16}
-      />      
-</>
+        ))}  
+</Group>
     );
 }
 
 
-const App = () => {
-  const [boxes, setBoxes] = useState([
-    { x: 20, y: 20, width: 100, height: 100, text: 'Box 1' },
-    { x: 140, y: 20, width: 100, height: 100, text: 'Box 2' },
-    { x: 260, y: 20, width: 100, height: 100, text: 'Box 3' },
-    { x: 380, y: 20, width: 100, height: 100, text: 'Box 4' },
-  ]);
-
-  const handleTextChange = (index, text) => {
-    const newBoxes = [...boxes];
-    newBoxes[index].text = text;
-    setBoxes(newBoxes);
-  };
-
-  return (
-    <Stage width={window.innerWidth} height={window.innerHeight}>
-      <Layer>
-        {boxes.map((box, index) => (
-          <React.Fragment key={index}>
-            <Rect
-              x={box.x}
-              y={box.y}
-              width={box.width}
-              height={box.height}
-            />
-            <Text
-              x={box.x + box.width / 2}
-              y={box.y + box.height / 2}
-              text={box.text}
-              onChange={(e) => handleTextChange(index, e.target.text)}
-            />
-          </React.Fragment>
-        ))}
-      </Layer>
-    </Stage>
-  );
-};
 
