@@ -15,10 +15,10 @@ export const EngineSkeleton = ({
 
     const smallBoxSize = (boxSize/2)*0.9
     const [boxes, setBoxes] = useState([
-        { x: boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, data: 'Engine', text: 'Box 1' },
-        { x: boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Temp', text: 'Box 2' },
-        { x: 3*boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, data: 'Presence', text: 'Box 1' },
-        { x: 3*boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Top-N', text: 'Box 2' }
+        { x: boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, data: 'Engine', text: 'davinci' },
+        { x: boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Temp', text: '0.7' },
+        { x: 3*boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, data: 'Presence', text: '0.0' },
+        { x: 3*boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Top-P', text: '1' }
       ]);
 
       const handleTextChange = (e) => {
@@ -74,7 +74,7 @@ export const EngineSkeleton = ({
                 fontFamily={'sans-serif'}
                 align={'center'}
                 perfectDrawEnabled={false}
-                fontSize={10}
+                fontSize={8}
             />
             {isEditing && (
                 <TextEditor

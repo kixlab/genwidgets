@@ -4,6 +4,7 @@ import { Html } from 'react-konva-utils';
 import { InputText } from "./Text/InputText";
 import { Prong } from './Prong/Prong';
 import { EngineContainer } from "./Pipeline/EngineContainer";
+import { useState } from "react";
 
 
 export function StickyNote({
@@ -30,6 +31,7 @@ export function StickyNote({
   const delBtnRf = useRef(null);
   const genBtnRf = useRef(null);
   const grpRef = useRef(null);
+  const [pipelineButton, setPipelineButton] = useState(false);
 
   const encodePosition = (key) => {
     return (40*key)+40
@@ -109,11 +111,15 @@ export function StickyNote({
         //   console.log('hu');
         // }}
         >
+        { pipelineButton && 
         <EngineContainer 
         width={width}
         height={height}
         engineSize={100}
+        onGenerate={onGenerate}
         />
+        }
+
         { isSelected &&
           <Html 
             class={"button"}
@@ -123,13 +129,13 @@ export function StickyNote({
             <button class="Delete-note-btn" onClick={onDelete} >Delete</button>
           </Html>
         }
-        { isSelected &&
+        { (isSelected && !pipelineButton) &&
           <Html 
             class={"button"}
             innerRef={genBtnRf}
             groupProps={{ x: width-140, y: height*1.1+10 }} 
-            divProps={{ style: { opacity: 0.63} }} >
-            <button class="Delete-note-btn" onClick={onGenerate} >Generate</button>
+            divProps={{ style: { opacity: 0.83} }} >
+            <button class="Add-note-btn" onClick={e => {setPipelineButton(true)}} >Add Engine</button>
           </Html>
         }
       {/* <Rect

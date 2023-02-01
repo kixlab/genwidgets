@@ -1,12 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { Rect, Text, Group } from 'react-konva';
+import { Html } from 'react-konva-utils';
 import { EngineSkeleton } from "./EngineSkeleton";
 
 export const EngineContainer = ({
     width,
     height,
     engineSize,
+    onGenerate,
 }) => {
+    const genBtnRf = useRef(null);
+
     return (
         <>
         <Rect
@@ -30,6 +34,13 @@ export const EngineContainer = ({
           y={0}
           engineSize={engineSize}
         />
+        <Html 
+            class={"button"}
+            innerRef={genBtnRf}
+            groupProps={{ x: width + 10 + engineSize/2, y: height*1.1+10 }} 
+            divProps={{ style: { opacity: 0.83} }} >
+            <button class="Add-note-btn" onClick={onGenerate} >Generate</button>
+        </Html>
     </>
     )
 }
