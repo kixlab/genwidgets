@@ -10,7 +10,8 @@ export const EngineSkeleton = ({
     engineSize,
     noteProps,
     onReplace,
-    onChange
+    onChange,
+    onTextClick
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const textRef = useRef(null);
@@ -35,6 +36,8 @@ export const EngineSkeleton = ({
       //   });
       // }
 
+
+      // pretty sure that there is an easier way to do this
       const handleTextChange = (e) => {
         e.preventDefault();
         if (editingBoxName === "Top-P") {
@@ -60,13 +63,13 @@ export const EngineSkeleton = ({
             engine: {...engine, eng: e.currentTarget.value},
           });
         }
-
       };
 
       const toggleEdit = (e) => {
         setIsEditing(true);
         setEditingBoxName(e.target.name());
-        console.log(textRef.current.name());
+        onTextClick();
+        //console.log(textRef.current.name());
       }
     
 

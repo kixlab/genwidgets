@@ -11,7 +11,8 @@ export const EngineContainer = ({
     noteProps,
     onGenerate,
     onReplace,
-    onChange
+    onChange,
+    onTextClick
 }) => {
     const genBtnRf = useRef(null);
 
@@ -41,6 +42,7 @@ export const EngineContainer = ({
           noteProps={noteProps}
           onReplace={onReplace}
           onChange={onChange}
+          onTextClick={onTextClick}
         />
         <Html 
             class={"button"}

@@ -229,8 +229,19 @@ export const Sticky = () => {
 
   const handleGenerateClick = (e) => {
     e.preventDefault();
-    const selectNote = [...notes].filter(note => note.id === selectedId)[0]
-    const data = { prompt: selectNote.text }
+    const selectNote = [...notes].filter(note => note.id === selectedId)[0];
+    const engineProps = selectNote.engine;
+    const data = { 
+      prompt: selectNote.text,
+      engine: engineProps.eng,
+      maxTokens: parseFloat(engineProps.maxTokens),
+      temperature: parseFloat(engineProps.temperature),
+      topP: parseFloat(engineProps.topP),
+      frequencyPen: parseFloat(engineProps.frequencyPen),
+      presencePen: parseFloat(engineProps.presencePen),
+      bestOf: parseFloat(engineProps.bestOf),
+      n: parseFloat(engineProps.n),
+    }
     axios
     .post(`http://localhost:8080/api/generate`, data)
     .then((response) => {

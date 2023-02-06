@@ -112,6 +112,7 @@ export function StickyNote({
         // onDragStart={() => {
         //   console.log('hu');
         // }}
+        onMouseOver={onSelect}
         >
         { pipelineButton && 
           <EngineContainer 
@@ -125,6 +126,7 @@ export function StickyNote({
           onReplace={onReplace}
           onGenerate={onGenerate}
           onChange={onChange}
+          onTextClick={onTextClick}
           />
         }
 
@@ -175,7 +177,7 @@ export function StickyNote({
         shadowOpacity={pipelineButton ? 0 : 0.3}
         shadowOffsetX={pipelineButton ? 0 : 10}
         shadowOffsetY={pipelineButton ? 0 : 10}
-        onMouseOver={onSelect}
+        //onMouseOver={onSelect}
         // do not put drag functions here
       />
       <InputText
