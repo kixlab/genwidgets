@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Rect, Stage, Layer } from "react-konva";
 import { StickyNote } from "./StickyNote";
+import { NoteContainer } from "./NoteContainer/NoteContainer";
 import axios from 'axios';
 
 const JOIN_DIST = 300;
@@ -32,6 +33,7 @@ export const Sticky = () => {
   const newid = useRef(0);
   const [notes, setNotes] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [containers, setContainers] = useState([])
 
   const [minDistance, setMinDistance] = useState({ distance: null, nodes: [] });
 
@@ -41,7 +43,6 @@ export const Sticky = () => {
   const [scale, setScale] = useState(1);
 
   const layerRef = useRef(null);
-
   const engineRef = useRef(null);
 
   // for stage pan and zoom
@@ -243,7 +244,7 @@ export const Sticky = () => {
         width: 200,
         height: 200,
         prongs: [], //prongs
-        engines: []
+        engine: {}
       }]);
       }
 
@@ -277,10 +278,8 @@ export const Sticky = () => {
         // x: clipboardNote.x + 30,
         // y: clipboardNote.y + 30
       }
-    ]);
-    }
-  }
-  }
+    ]);}
+  }}
   
   // change some attr(s) of a note and put the new note in here
   const replaceNote = (newNote) => {
@@ -323,11 +322,11 @@ export const Sticky = () => {
       {/* <p>
         Minimum distance between nodes:{" "}
         {minDistance.nodes.map(node => node.id).join(", ")} ({minDistance.distance})
-      </p> */}
+      </p> <button class="Concat-note-btn" onClick={handleConcatClick}>Concat Near</button>*/}
       <p>
         Double tap on canvas to add text. Pan and zoom canvas as needed.
       </p>
-    <button class="Concat-note-btn" onClick={handleConcatClick}>Concat Near</button>
+    
     <Stage
       width={window.innerWidth}
       height={window.innerHeight}
@@ -344,7 +343,17 @@ export const Sticky = () => {
           width: 200,
           height: 200,
           prongs: [], //prongs
-          engines: []
+          engine: { 
+            // prompt: GENERATION PROMPT HERE,
+            eng: "text-davinci-003",
+            maxTokens: "256",
+            temperature: "0.7",
+            topP: "1",
+            frequencyPen: "0.0",
+            presencePen: "0.0",
+            bestOf: "1",
+            n: "1",
+          }
         }]);
       }}}
 
@@ -359,6 +368,17 @@ export const Sticky = () => {
     >
       
       <Layer ref={layerRef}>
+      {containers.map((container, index) => {
+        return(
+          <NoteContainer
+            key={index}
+            x={container.x}
+            y={container.y}
+            containerProps={container}
+          />
+        )
+      })
+      }
       {notes.map((note, index) => {
         return(
         <StickyNote
@@ -369,7 +389,7 @@ export const Sticky = () => {
           width={note.width}
           height={note.height}
           prongs={note.prongs}
-          engines={note.engines}
+          engine={note.engine}
           
           noteProps={note}
           layerRef={layerRef}

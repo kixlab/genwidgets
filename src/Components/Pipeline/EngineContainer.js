@@ -6,8 +6,12 @@ import { EngineSkeleton } from "./EngineSkeleton";
 export const EngineContainer = ({
     width,
     height,
+    engine,
     engineSize,
+    noteProps,
     onGenerate,
+    onReplace,
+    onChange
 }) => {
     const genBtnRf = useRef(null);
 
@@ -32,7 +36,11 @@ export const EngineContainer = ({
         <EngineSkeleton
           x={width+50}
           y={0}
+          engine={engine}
           engineSize={engineSize}
+          noteProps={noteProps}
+          onReplace={onReplace}
+          onChange={onChange}
         />
         <Html 
             class={"button"}

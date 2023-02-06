@@ -14,7 +14,7 @@ export function StickyNote({
   width,
   height,
   prongs,
-  engines,
+  engine,
   noteProps,
   layerRef,
   isSelected, 
@@ -94,6 +94,8 @@ export function StickyNote({
     }
   }
 
+  
+
   return (
     <div className="item">
     <Group
@@ -112,12 +114,18 @@ export function StickyNote({
         // }}
         >
         { pipelineButton && 
-        <EngineContainer 
-        width={width}
-        height={height}
-        engineSize={100}
-        onGenerate={onGenerate}
-        />
+          <EngineContainer 
+          width={width}
+          height={height}
+
+          engine={engine}
+          engineSize={100}
+          
+          noteProps={noteProps}
+          onReplace={onReplace}
+          onGenerate={onGenerate}
+          onChange={onChange}
+          />
         }
 
         { isSelected &&
@@ -163,10 +171,10 @@ export function StickyNote({
         scaleY={isSelected ? 1.2 : 1}
         opacity={0.42}
         shadowColor="black"
-        shadowBlur={10}
-        shadowOpacity={0.3}
-        shadowOffsetX={10}
-        shadowOffsetY={10}
+        shadowBlur={pipelineButton ? 0 : 10}
+        shadowOpacity={pipelineButton ? 0 : 0.3}
+        shadowOffsetX={pipelineButton ? 0 : 10}
+        shadowOffsetY={pipelineButton ? 0 : 10}
         onMouseOver={onSelect}
         // do not put drag functions here
       />

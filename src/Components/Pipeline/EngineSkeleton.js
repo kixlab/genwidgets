@@ -6,30 +6,67 @@ import { TextEditor } from '../Text/TextEditor'
 export const EngineSkeleton = ({
     x,
     y,
+    engine,
     engineSize,
+    noteProps,
+    onReplace,
+    onChange
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const textRef = useRef(null);
+    const [editingBoxName, setEditingBoxName] = useState(null);
+    //const index = useState();
 
     const boxSize = engineSize;
 
     const smallBoxSize = (boxSize/2)*0.9
-    const [boxes, setBoxes] = useState([
-        { x: boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, data: 'Engine', text: 'davinci' },
-        { x: boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Temp', text: '0.7' },
-        { x: 3*boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, data: 'Presence', text: '0.0' },
-        { x: 3*boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Top-P', text: '1' }
-      ]);
+    const boxes = [
+        { x: boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, data: 'Engine', text: engine.eng },
+        { x: boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Temp', text: engine.temperature },
+        { x: 3*boxSize/4 - smallBoxSize/2, y: boxSize/4 - smallBoxSize/2, data: 'Presence', text: engine.presencePen },
+        { x: 3*boxSize/4 - smallBoxSize/2, y: 3*boxSize/4 - smallBoxSize/2, data: 'Top-P', text: engine.topP }
+      ];
+
+      // const handleEngineChange = (e) => {
+        
+      //   onChange({
+      //     ...noteProps,
+      //     engine: e.target.position().x,
+      //   });
+      // }
 
       const handleTextChange = (e) => {
-        console.log("baby", e.target.value);
-        // const newBoxes = [...boxes];
-        // newBoxes[index].text = e.currentTarget.value;
-        // setBoxes(newBoxes);
+        e.preventDefault();
+        if (editingBoxName === "Top-P") {
+          // const upEng = {...engine, topP: e.target.value}
+          // console.log(upEng)
+          onChange({
+            ...noteProps,
+            engine: {...engine, topP: e.target.value},
+          });
+        } else if (editingBoxName === "Temp") {
+          onChange({
+            ...noteProps,
+            engine: {...engine, temperature: e.currentTarget.value},
+          });
+        } else if (editingBoxName === "Presence") {
+          onChange({
+            ...noteProps,
+            engine: {...engine, presencePen: e.currentTarget.value},
+          });
+        } else if (editingBoxName === "Engine") {
+          onChange({
+            ...noteProps,
+            engine: {...engine, eng: e.currentTarget.value},
+          });
+        }
+
       };
 
-      function toggleEdit() {
+      const toggleEdit = (e) => {
         setIsEditing(true);
+        setEditingBoxName(e.target.name());
+        console.log(textRef.current.name());
       }
     
 
@@ -59,6 +96,7 @@ export const EngineSkeleton = ({
               perfectDrawEnabled={false}
             />
             <Text
+                name={box.data}
                 x={box.x}
                 y={box.y + 2.5*smallBoxSize / 4}
                 width={smallBoxSize}
