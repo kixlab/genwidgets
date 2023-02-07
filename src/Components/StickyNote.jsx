@@ -7,6 +7,16 @@ import { EngineContainer } from "./Pipeline/EngineContainer";
 import { useState } from "react";
 
 
+function eucDist (p1, p2) {
+  if (p1.x && p2.x) {
+  var xc = p2.x - p1.x
+  var yc = p2.y - p1.y
+  return {x: xc, y: yc};
+  } else {
+    return {x: 0, y: 0};
+  }
+}
+
 export function StickyNote({
   x,
   y,
@@ -33,6 +43,8 @@ export function StickyNote({
   const grpRef = useRef(null);
   const [pipelineButton, setPipelineButton] = useState(false);
 
+  const [startCoord, setStartCoord] = useState({x: null, y: null});
+
   const encodePosition = (key) => {
     return (40*key)+40
   }
@@ -40,8 +52,14 @@ export function StickyNote({
     return 0.025*(pos-40)
   }
   
-  const handleCoordChange = (e) => {
+  const handleDragStart = (e) => {
+    setStartCoord(e.target.position());
+  }
+
+  const handleDragEnd = (e) => {
     // coordinate change
+    // **// distance = eucDist(startCoord, e.target.position());
+
     onChange({
       ...noteProps,
       x: e.target.position().x,
@@ -97,18 +115,19 @@ export function StickyNote({
   
 
   return (
-    <div className="item">
     <Group
         name={"text component"}
         x={x} 
         y={y} 
         noteProps={noteProps}
+        // dragDistance={e => console.log("dragdist", e)}
         draggable
         ref={grpRef}
         // onDragStart={(e) => {
         //   console.log('start'+e.target.position().x);
         // }}
-        onDragEnd={handleCoordChange}
+        onDragEnd={handleDragEnd}
+        onDragStart={handleDragStart}
         // onDragStart={() => {
         //   console.log('hu');
         // }}
@@ -216,6 +235,5 @@ export function StickyNote({
       />
       
     </Group>
-    </div>
   );
 }

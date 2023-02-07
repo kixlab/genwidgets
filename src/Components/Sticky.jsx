@@ -31,6 +31,7 @@ function isTouchEnabled() {
 
 export const Sticky = () => {
   const newid = useRef(0);
+  const contid = useRef(0);
   const [notes, setNotes] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [containers, setContainers] = useState([])
@@ -226,6 +227,17 @@ export const Sticky = () => {
       setSelectedId(null); 
     }
   }
+  
+  const handleAddCont = (e) => {
+    setContainers([...containers, 
+      { id: contid.current++,
+        x: 100,
+        y: 100,
+        height: 100,
+        width: 100
+      }
+    ]);
+  }
 
   const handleGenerateClick = (e) => {
     e.preventDefault();
@@ -251,12 +263,24 @@ export const Sticky = () => {
         x: 200,
         y: 200,
         id: newid.current++,
-        text: response.data.generations[0], 
+        text: `${response.data.generations[0]}`, 
         width: 200,
         height: 200,
         prongs: [], //prongs
-        engine: {}
-      }]);
+        engine: { 
+          // prompt: GENERATION PROMPT HERE,
+          eng: "text-davinci-003",
+          maxTokens: "256",
+          temperature: "0.7",
+          topP: "1",
+          frequencyPen: "0.0",
+          presencePen: "0.0",
+          bestOf: "1",
+          n: "1",
+        },
+        container: null
+      }
+      ]);
       }
 
     });
@@ -327,13 +351,12 @@ export const Sticky = () => {
       tabIndex={1} 
       onKeyDown={handleKeyDown}
       >
-      <aside><h1>Genwidgets</h1></aside>
-      
-            
+      <aside><h1>Genwidgets</h1></aside>   
       {/* <p>
         Minimum distance between nodes:{" "}
         {minDistance.nodes.map(node => node.id).join(", ")} ({minDistance.distance})
       </p> <button class="Concat-note-btn" onClick={handleConcatClick}>Concat Near</button>*/}
+      <button class="Concat-note-btn" onClick={handleAddCont}>Add Container</button>
       <p>
         Double tap on canvas to add text. Pan and zoom canvas as needed.
       </p>
@@ -364,7 +387,8 @@ export const Sticky = () => {
             presencePen: "0.0",
             bestOf: "1",
             n: "1",
-          }
+          },
+          container: null
         }]);
       }}}
 
@@ -385,6 +409,15 @@ export const Sticky = () => {
             key={index}
             x={container.x}
             y={container.y}
+            width={container.width}
+            height={container.height}
+            layerRef={layerRef}
+            onChange={(newAttrs) => {
+              const nwConts = containers.slice();
+              nwConts[index] = newAttrs;
+              setNotes(nwConts);
+            }}
+            allNotes={notes}
             containerProps={container}
           />
         )
