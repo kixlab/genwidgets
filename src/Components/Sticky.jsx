@@ -403,26 +403,7 @@ export const Sticky = () => {
     >
       
       <Layer ref={layerRef}>
-      {containers.map((container, index) => {
-        return(
-          <NoteContainer
-            key={index}
-            x={container.x}
-            y={container.y}
-            width={container.width}
-            height={container.height}
-            layerRef={layerRef}
-            onChange={(newAttrs) => {
-              const nwConts = containers.slice();
-              nwConts[index] = newAttrs;
-              setNotes(nwConts);
-            }}
-            allNotes={notes}
-            containerProps={container}
-          />
-        )
-      })
-      }
+      
       {notes.map((note, index) => {
         return(
         <StickyNote
@@ -465,6 +446,26 @@ export const Sticky = () => {
         />
         );
       })}
+      {containers.map((container, index) => {
+        return(
+          <NoteContainer
+            key={index}
+            x={container.x}
+            y={container.y}
+            width={container.width}
+            height={container.height}
+            layerRef={layerRef}
+            onChange={(newAttrs) => {
+              const nwConts = containers.slice();
+              nwConts[index] = newAttrs;
+              setContainers(nwConts);
+            }}
+            allNotes={notes}
+            containerProps={container}
+          />
+        )
+      })
+      }
       </Layer>
       <Layer>
         <Rect
@@ -488,6 +489,7 @@ export const Sticky = () => {
           }
           }
         }
+        
         />
       </Layer>
     </Stage>

@@ -16,8 +16,13 @@ export const NoteContainer = ({
     const contNotes = allNotes.filter(note => note.container === containerProps.id);
 
     const handleDragEnd = (e) => {
-        
+        onChange({
+            ...containerProps, 
+            x: e.target.position().x,
+            y: e.target.position().y
+        }) 
     }
+    
     return (
     <Group
     draggable 

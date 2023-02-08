@@ -69,8 +69,9 @@ export function StickyNote({
     console.log("onChange",
     //...e.target.children.filter(child => child.getAttrs().className === "bulb"),
     e.target,
+
     // e.target.getAbsolutePosition(),
-    // layerRef.current.getIntersection(e.target.position()),
+    layerRef.current.getIntersection(e.target.position()),
     // layerRef.current.getIntersection(e.target.getAbsolutePosition()),
 //    bulbPositionShape.className,
 //    bulbPositionShape.parent !== grpRef.current,
@@ -81,6 +82,8 @@ export function StickyNote({
     const bulb = e.target.children.filter(
       child => child.getAttrs().className === "bulb" 
       )[0].getAbsolutePosition();
+    
+    // look in the middle of the bulb
     const bulbPositionShape = layerRef.current.getIntersection({x:bulb.x+10, y:bulb.y+10});
     if (bulbPositionShape.getAttrs().className === 'prong') {
       console.log('Image', bulbPositionShape.parent.getAttrs().noteProps, grpRef.current);
