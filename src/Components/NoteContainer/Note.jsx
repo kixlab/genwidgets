@@ -26,6 +26,8 @@ export function Note({
   // prongs,
   noteProps,
   layerRef,
+  onNoteChange,
+  toggleDrag,
   // isSelected, 
   // onSelect, 
   // onChange,
@@ -36,6 +38,7 @@ export function Note({
 }) {
   const delBtnRf = useRef(null);
   const grpRef = useRef(null);
+  const textRef = useRef(null);
 
   const [startCoord, setStartCoord] = useState({x: null, y: null});
 
@@ -47,14 +50,25 @@ export function Note({
   // }
   
   const handleDragStart = (e) => {
+    toggleDrag(false);
     setStartCoord(e.target.position());
   }
 
   const handleDragEnd = (e) => {
     // coordinate change
     // **// distance = eucDist(startCoord, e.target.position());
+    console.log(eucDist(startCoord, e.target.position()));
+    setTimeout(() => {
+      toggleDrag(true);
+    }, 100);
+    
+    onNoteChange({
+      ...noteProps,
+      x: startCoord.x,
+      y: startCoord.y,
+    });
 
-    // onChange({
+    // onNoteChange({
     //   ...noteProps,
     //   x: e.target.position().x,
     //   y: e.target.position().y,
@@ -100,8 +114,8 @@ export function Note({
         // dragDistance={e => console.log("dragdist", e)}
         draggable
         ref={grpRef}
-        // onDragEnd={handleDragEnd}
-        // onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragStart={handleDragStart}
         // onMouseOver={onSelect}
         >
 
@@ -115,7 +129,7 @@ export function Note({
           </Html>
         } */}
       <Rect
-        className="container"
+
         // x={isSelected ? 0 : 10}
         // y={isSelected ? 0 : 20}
         x={0}
@@ -136,16 +150,21 @@ export function Note({
       />
       <Text //InputText
         x={20}
-        y={40}
+        y={20}
         text={text}
-        width={width}
+        width={width-20}
         height={height}
+        ref={textRef} 
         // prongs={prongs}
         // noteProps={noteProps}
         // layerRef={layerRef}
         // isSelected={isSelected}
         // onTextClick={onTextClick}
         // onChange={onChange}
+        fill={'#ffffff'}
+        fontFamily={'sans-serif'}
+        perfectDrawEnabled={false}
+        fontSize={16}
       />
       {/* {prongs.map((prong, index) => (
         <Prong

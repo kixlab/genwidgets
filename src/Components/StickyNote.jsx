@@ -78,6 +78,18 @@ export function StickyNote({
     grpRef.current
     );
 
+    if (layerRef.current.getIntersection(e.target.position())) {
+      var str = layerRef.current.getIntersection(e.target.position()).name();
+      var contNum = parseInt(str.charAt(str.length-1));
+      onChange({
+        ...noteProps,
+        container: contNum
+      })
+      console.log(
+        contNum
+        );
+    }
+
     //check if there is anything on the bulb
     const bulb = e.target.children.filter(
       child => child.getAttrs().className === "bulb" 

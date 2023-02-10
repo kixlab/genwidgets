@@ -9,35 +9,39 @@ export const NoteContainer = ({
     height,
     layerRef,
     onChange,
+    onNoteChange,
     allNotes,
     containerProps,
     // contNotes
 }) => {
     const contNotes = allNotes.filter(note => note.container === containerProps.id);
-
+    const [dragBool, setDragBool] = useState(true);
     const handleDragEnd = (e) => {
+        if (dragBool) {
         onChange({
             ...containerProps, 
             x: e.target.position().x,
             y: e.target.position().y
         }) 
     }
-    
+    }
+
     return (
     <Group
-    draggable 
+    draggable={dragBool}
     x={x}
     y={y}
     onDragEnd={handleDragEnd}
     >
     <Rect
+    name={"note-container-"+`${containerProps.id}`}
     x={0}
     y={0}
-    width={width}
+    width={width+20}
     height={height}
-    fill="white"
-    stroke="black"
-    strokeWidth={1}
+    stroke="#4D94FF"
+    cornerRadius={4}
+    strokeWidth={5}
     />
     {contNotes && contNotes.map((note, index) => {
         return(
@@ -46,12 +50,14 @@ export const NoteContainer = ({
           x={0}
           y={0} 
           text={note.text}
-          width={note.width}
+          width={width}
           height={note.height}
           // prongs={note.prongs}
           
           noteProps={note}
           layerRef={layerRef}
+          onNoteChange={onNoteChange}
+          toggleDrag={(bool)=>setDragBool(bool)}
 
         //   onSelect={() => {
         //     setSelectedId(note.id);

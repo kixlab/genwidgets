@@ -234,7 +234,7 @@ export const Sticky = () => {
         x: 100,
         y: 100,
         height: 100,
-        width: 100
+        width: 200
       }
     ]);
   }
@@ -405,6 +405,7 @@ export const Sticky = () => {
       <Layer ref={layerRef}>
       
       {notes.map((note, index) => {
+        if (note.container === null) {
         return(
         <StickyNote
           key={index}
@@ -445,6 +446,7 @@ export const Sticky = () => {
           onGenerate={handleGenerateClick}
         />
         );
+        }
       })}
       {containers.map((container, index) => {
         return(
@@ -460,6 +462,11 @@ export const Sticky = () => {
               nwConts[index] = newAttrs;
               setContainers(nwConts);
             }}
+            onNoteChange={(newAttrs) => {
+              const nwNotes = notes.slice();
+              nwNotes[index] = newAttrs;
+              setNotes(nwNotes);
+            }}
             allNotes={notes}
             containerProps={container}
           />
@@ -467,7 +474,7 @@ export const Sticky = () => {
       })
       }
       </Layer>
-      <Layer>
+      {/* <Layer>
         <Rect
         name="dragging-engine"
         x={0}
@@ -491,7 +498,7 @@ export const Sticky = () => {
         }
         
         />
-      </Layer>
+      </Layer> */}
     </Stage>
     </div>
   );
