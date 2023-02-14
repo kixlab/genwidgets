@@ -60,9 +60,6 @@ export function Note({
 
   const handleDragEnd = (e) => {
     // coordinate change
-    // **// distance = eucDist(startCoord, e.target.position());
-    console.log(e.evt.x, e.evt.y);
-    console.log(startCoord, eucDist(startCoord, {x: e.evt.x, y: e.evt.y}));
     const dist = eucDist(startCoord, {x: e.evt.x, y: e.evt.y});
     setTimeout(() => {
       toggleDrag(true);
@@ -80,8 +77,8 @@ export function Note({
       console.log("replace", dist.x**2 + dist.y**2 > width**2, noteProps);
       onNoteChange({
         ...noteProps,
-        x: containerProps.x + dist.x,
-        y: containerProps.y + dist.y,
+        x: containerProps.x + dist.x + x,
+        y: containerProps.y + dist.y + y,
         container: null
       })
       // grpRef.current.to({
@@ -90,6 +87,7 @@ export function Note({
       //   duration: 0.5
       // });
     } else {
+      console.log("BOOM BOOM BOOM", dist.x**2 + dist.y**2)
       // onNoteChange({
       //   ...noteProps,
       //   x: startCoord.x,

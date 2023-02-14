@@ -78,7 +78,8 @@ export function StickyNote({
     grpRef.current
     );
 
-    if (layerRef.current.getIntersection(e.target.position())) {
+    if (layerRef.current.getIntersection(e.target.position()) && 
+    layerRef.current.getIntersection(e.target.position()).name().includes("note-container")) {
       var str = layerRef.current.getIntersection(e.target.position()).name();
       var contNum = parseInt(str.charAt(str.length-1));
       onChange({
