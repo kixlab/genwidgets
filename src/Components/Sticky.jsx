@@ -462,11 +462,12 @@ export const Sticky = () => {
               nwConts[index] = newAttrs;
               setContainers(nwConts);
             }}
-            onNoteChange={(newAttrs) => {
-              const nwNotes = notes.slice();
-              nwNotes[index] = newAttrs;
-              setNotes(nwNotes);
-            }}
+            setNotes={setNotes}
+            // onNoteChange={(newAttrs) => {
+            //   const nwNotes = notes.slice();
+            //   nwNotes[index] = newAttrs;
+            //   setNotes(nwNotes);
+            // }}
             allNotes={notes}
             containerProps={container}
           />

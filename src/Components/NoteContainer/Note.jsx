@@ -25,6 +25,7 @@ export function Note({
   height,
   // prongs,
   noteProps,
+  containerProps,
   layerRef,
   onNoteChange,
   toggleDrag,
@@ -40,7 +41,9 @@ export function Note({
   const grpRef = useRef(null);
   const textRef = useRef(null);
 
-  const [startCoord, setStartCoord] = useState({x: null, y: null});
+  const [noteText, setNoteText] = useState(text);
+
+  const [startCoord, setStartCoord] = useState({x: noteProps.x, y: noteProps.y});
 
   // const encodePosition = (key) => {
   //   return (40*key)+40
@@ -51,22 +54,50 @@ export function Note({
   
   const handleDragStart = (e) => {
     toggleDrag(false);
-    setStartCoord(e.target.position());
+    console.log(e.evt.x, e.evt.y);
+    setStartCoord({x: e.evt.x, y: e.evt.y});
   }
 
   const handleDragEnd = (e) => {
     // coordinate change
     // **// distance = eucDist(startCoord, e.target.position());
-    console.log(eucDist(startCoord, e.target.position()));
+    console.log(e.evt.x, e.evt.y);
+    console.log(startCoord, eucDist(startCoord, {x: e.evt.x, y: e.evt.y}));
+    const dist = eucDist(startCoord, {x: e.evt.x, y: e.evt.y});
     setTimeout(() => {
       toggleDrag(true);
     }, 100);
     
-    onNoteChange({
-      ...noteProps,
-      x: startCoord.x,
-      y: startCoord.y,
-    });
+    //if  
+    
+    // grpRef.current.to({
+    //   x: startCoord.x,
+    //   y: startCoord.y,
+    //   duration: 0.5
+    // });
+
+    if (dist.x**2 + dist.y**2 > width**2) {
+      console.log("replace", dist.x**2 + dist.y**2 > width**2, noteProps);
+      onNoteChange({
+        ...noteProps,
+        x: containerProps.x + dist.x,
+        y: containerProps.y + dist.y,
+        container: null
+      })
+      // grpRef.current.to({
+      //   x: dist.x,
+      //   y: dist.y,
+      //   duration: 0.5
+      // });
+    } else {
+      // onNoteChange({
+      //   ...noteProps,
+      //   x: startCoord.x,
+      //   y: startCoord.y,
+      // });
+    }
+
+    
 
     // onNoteChange({
     //   ...noteProps,
@@ -103,7 +134,32 @@ export function Note({
     // }
   }
 
-  
+  useEffect(() => {
+    const text = textRef.current;
+    // Object.entries(text.textArr).map(([key, value]) => {
+    //     const prongPos = prongs.map(obj => obj.position)
+    //     if (value.text.includes('[[input]]') && !prongPos.includes(key)) {
+    //         const posL = prongs.slice();
+    //         posL.push({position:key, text:''});
+    //         onChange({
+    //           ...noteProps,
+    //           prongs: posL,
+    //         });
+    //     // console.log(`${key}: ${value.text.split(' ')}`, prongs.includes(key));
+    //     } else if (!value.text.includes('[[input]]') && prongPos.includes(key)) {
+    //         onChange({
+    //           ...noteProps,
+    //           prongs: prongs.filter(obj => obj.position !== key),
+    //         });
+    //         // console.log(prongs);
+    //     }
+    // });
+    // adjust height function
+    if (text.textArr.length*16 > height) {
+      console.log('adjust height', text.textArr);
+      setNoteText(text.textArr.join(' '));
+    }
+  }, [noteProps]);
 
   return (
     <Group

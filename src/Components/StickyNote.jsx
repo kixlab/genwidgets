@@ -83,6 +83,8 @@ export function StickyNote({
       var contNum = parseInt(str.charAt(str.length-1));
       onChange({
         ...noteProps,
+        x: e.target.position().x,
+        y: e.target.position().y,
         container: contNum
       })
       console.log(

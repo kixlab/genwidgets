@@ -9,12 +9,16 @@ export const NoteContainer = ({
     height,
     layerRef,
     onChange,
-    onNoteChange,
+    setNotes,
+    // onNoteChange,
     allNotes,
     containerProps,
     // contNotes
 }) => {
     const contNotes = allNotes.filter(note => note.container === containerProps.id);
+    const nonContNotes = allNotes.filter(note => note.container !== containerProps.id);
+    const totalHeight = contNotes.reduce((acc, note) => acc + note.height, 0)
+    const heightList = contNotes.map(note => note.height)
     const [dragBool, setDragBool] = useState(true);
     const handleDragEnd = (e) => {
         if (dragBool) {
@@ -38,7 +42,7 @@ export const NoteContainer = ({
     x={0}
     y={0}
     width={width+20}
-    height={height}
+    height={totalHeight + height}
     stroke="#4D94FF"
     cornerRadius={4}
     strokeWidth={5}
@@ -48,16 +52,24 @@ export const NoteContainer = ({
         <Note
           key={index}
           x={0}
-          y={0} 
+          y={225*index} 
           text={note.text}
           width={width}
           height={note.height}
           // prongs={note.prongs}
           
           noteProps={note}
+          containerProps={containerProps}
           layerRef={layerRef}
-          onNoteChange={onNoteChange}
+          // onNoteChange={onNoteChange}
+          onNoteChange={(newAttrs) => {
+            const nwNotes = contNotes.slice();
+            nwNotes[index] = newAttrs;
+            setNotes(nwNotes.concat(nonContNotes));
+          }}
           toggleDrag={(bool)=>setDragBool(bool)}
+
+
 
         //   onSelect={() => {
         //     setSelectedId(note.id);
