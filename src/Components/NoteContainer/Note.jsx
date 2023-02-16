@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { Group, Rect, Text } from "react-konva";
-import { Html } from 'react-konva-utils';
+
 // import { InputText } from "../Text/InputText";
 // import { Prong } from '../Prong/Prong';
 // import { EngineContainer } from "../Pipeline/EngineContainer";
@@ -35,9 +35,9 @@ export function Note({
   // onReplace,
   
   // onTextClick,
-  // onDelete,
+  
 }) {
-  const delBtnRf = useRef(null);
+
   const grpRef = useRef(null);
   const textRef = useRef(null);
 
@@ -172,16 +172,7 @@ export function Note({
         onDragStart={handleDragStart}
         // onMouseOver={onSelect}
         >
-
-        {/* { isSelected &&
-          <Html 
-            class={"button"}
-            innerRef={delBtnRf}
-            groupProps={{ x: width-40, y: height*1.1+10 }} 
-            divProps={{ style: { opacity: 0.63} }} >
-            <button class="Delete-note-btn" onClick={onDelete} >Delete</button>
-          </Html>
-        } */}
+          
       <Rect
 
         // x={isSelected ? 0 : 10}

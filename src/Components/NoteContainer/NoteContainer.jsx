@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Rect, Text, Group } from 'react-konva';
+import { Html } from 'react-konva-utils';
 import { Note } from './Note';
 
 export const NoteContainer = ({
@@ -13,8 +14,10 @@ export const NoteContainer = ({
     // onNoteChange,
     allNotes,
     containerProps,
+    onDelete,
     // contNotes
 }) => {
+    const delBtnRf = useRef(null);
     const contNotes = allNotes.filter(note => note.container === containerProps.id);
     const nonContNotes = allNotes.filter(note => note.container !== containerProps.id);
     const totalHeight = contNotes.reduce((acc, note) => acc + note.height, 0)
@@ -36,7 +39,15 @@ export const NoteContainer = ({
     x={x}
     y={y}
     onDragEnd={handleDragEnd}
+    //onMouseEnter=
     >
+    <Html 
+      class={"button"}
+      innerRef={delBtnRf}
+      groupProps={{ x: width, y: 0 }} 
+      divProps={{ style: { opacity: 0.63} }} >
+      <button class="Delete-container-btn" onClick={onDelete} onMouseEnter>x</button>
+    </Html>
     <Rect
     name={"note-container-"+`${containerProps.id}`}
     x={0}
@@ -86,7 +97,6 @@ export const NoteContainer = ({
         //     setSelectedId(note.id);
         //     setIsEditing(true);
         //   }}
-          // onDelete={handleDeleteClick}
         />
         );
     })}

@@ -16,6 +16,8 @@ Finally, run the server:
 
 #### `python start.py`
 
+If there are any errors pip3 install all the deps
+
 ## Server API Documentation
 
 ### POST: `/api/generate`

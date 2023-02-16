@@ -162,6 +162,12 @@ export const Sticky = () => {
     //     console.log(response)
     // });
   }
+  const handleContainerDelete = (e) => {
+    e.preventDefault();
+    console.log("container delete", e);
+    setNotes(containers.filter((note) => note.id!== selectedId));
+    setSelectedId(null); 
+  }
 
   useEffect(() => { 
     
@@ -241,8 +247,29 @@ export const Sticky = () => {
 
   const handleGenerateClick = (e) => {
     e.preventDefault();
+
     const selectNote = [...notes].filter(note => note.id === selectedId)[0];
     const engineProps = selectNote.engine;
+
+    // console.log('generate', e);
+
+    var defaultContainerId = null;
+    if (containers.length > 0) {
+      defaultContainerId = [...containers].pop().id;
+    } else {
+      const tempId = contid.current++;
+      setContainers([...containers, 
+        { id: tempId,
+          x: selectNote.x + 200,
+          y: selectNote.y,
+          height: 100,
+          width: 200
+        }
+      ]);
+      defaultContainerId = tempId;
+    }
+    
+    
     const data = { 
       prompt: selectNote.text,
       engine: engineProps.eng,
@@ -278,7 +305,7 @@ export const Sticky = () => {
           bestOf: "1",
           n: "1",
         },
-        container: 1
+        container: defaultContainerId
       }
       ]);
       }
@@ -420,6 +447,7 @@ export const Sticky = () => {
           noteProps={note}
           layerRef={layerRef}
           isSelected={note.id === selectedId}
+          addContainer={handleAddCont}
           onSelect={() => {
             setSelectedId(note.id);
             setIsEditing(false);
@@ -470,6 +498,7 @@ export const Sticky = () => {
             // }}
             allNotes={notes}
             containerProps={container}
+            onDelete={handleContainerDelete}
           />
         )
       })
