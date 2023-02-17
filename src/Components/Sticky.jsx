@@ -35,6 +35,7 @@ export const Sticky = () => {
   const [notes, setNotes] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [containers, setContainers] = useState([])
+  const [selectedContId, setSelectedContId] = useState(null);
 
   const [minDistance, setMinDistance] = useState({ distance: null, nodes: [] });
 
@@ -165,8 +166,9 @@ export const Sticky = () => {
   const handleContainerDelete = (e) => {
     e.preventDefault();
     console.log("container delete", e);
-    setNotes(containers.filter((note) => note.id!== selectedId));
-    setSelectedId(null); 
+    setContainers(containers.filter((container) => container.id!== selectedContId));
+    setNotes(notes.filter((note) => note.container!== selectedContId));
+    // setId(null); 
   }
 
   useEffect(() => { 
@@ -260,7 +262,7 @@ export const Sticky = () => {
       const tempId = contid.current++;
       setContainers([...containers, 
         { id: tempId,
-          x: selectNote.x + 200,
+          x: selectNote.x + 400,
           y: selectNote.y,
           height: 100,
           width: 200
@@ -485,6 +487,9 @@ export const Sticky = () => {
             width={container.width}
             height={container.height}
             layerRef={layerRef}
+            onContSelect={() => {
+              setSelectedContId(container.id);
+            }}
             onChange={(newAttrs) => {
               const nwConts = containers.slice();
               nwConts[index] = newAttrs;

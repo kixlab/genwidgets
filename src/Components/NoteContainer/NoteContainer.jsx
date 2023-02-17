@@ -15,6 +15,7 @@ export const NoteContainer = ({
     allNotes,
     containerProps,
     onDelete,
+    onContSelect,
     // contNotes
 }) => {
     const delBtnRf = useRef(null);
@@ -39,14 +40,14 @@ export const NoteContainer = ({
     x={x}
     y={y}
     onDragEnd={handleDragEnd}
-    //onMouseEnter=
+    onMouseOver={onContSelect}
     >
     <Html 
       class={"button"}
       innerRef={delBtnRf}
       groupProps={{ x: width, y: 0 }} 
       divProps={{ style: { opacity: 0.63} }} >
-      <button class="Delete-container-btn" onClick={onDelete} onMouseEnter>x</button>
+      <button class="Delete-container-btn" onClick={onDelete} >x</button>
     </Html>
     <Rect
     name={"note-container-"+`${containerProps.id}`}
