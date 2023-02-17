@@ -3,6 +3,19 @@ import { Group, Rect } from "react-konva";
 import { Html } from 'react-konva-utils';
 import { InputText } from "./Text/InputText";
 import { Prong } from './Prong/Prong';
+import { EngineContainer } from "./Pipeline/EngineContainer";
+import { useState } from "react";
+
+
+function eucDist (p1, p2) {
+  if (p1.x && p2.x) {
+  var xc = p2.x - p1.x
+  var yc = p2.y - p1.y
+  return {x: xc, y: yc};
+  } else {
+    return {x: 0, y: 0};
+  }
+}
 
 export function StickyNote({
   x,
@@ -11,18 +24,26 @@ export function StickyNote({
   width,
   height,
   prongs,
+  engine,
   noteProps,
   layerRef,
   isSelected, 
   onSelect, 
   onChange,
+  onGenerate,
+
   onReplace,
   onFilter,
+  
   onTextClick,
   onDelete,
 }) {
   const delBtnRf = useRef(null);
+  const genBtnRf = useRef(null);
   const grpRef = useRef(null);
+  const [pipelineButton, setPipelineButton] = useState(false);
+
+  const [startCoord, setStartCoord] = useState({x: null, y: null});
 
   const encodePosition = (key) => {
     return (40*key)+40
@@ -31,8 +52,14 @@ export function StickyNote({
     return 0.025*(pos-40)
   }
   
-  const handleCoordChange = (e) => {
+  const handleDragStart = (e) => {
+    setStartCoord(e.target.position());
+  }
+
+  const handleDragEnd = (e) => {
     // coordinate change
+    // **// distance = eucDist(startCoord, e.target.position());
+
     onChange({
       ...noteProps,
       x: e.target.position().x,
@@ -42,18 +69,35 @@ export function StickyNote({
     console.log("onChange",
     //...e.target.children.filter(child => child.getAttrs().className === "bulb"),
     e.target,
+
     // e.target.getAbsolutePosition(),
-    // layerRef.current.getIntersection(e.target.position()),
+    layerRef.current.getIntersection(e.target.position()),
     // layerRef.current.getIntersection(e.target.getAbsolutePosition()),
 //    bulbPositionShape.className,
 //    bulbPositionShape.parent !== grpRef.current,
     grpRef.current
     );
 
+    if (layerRef.current.getIntersection(e.target.position())) {
+      var str = layerRef.current.getIntersection(e.target.position()).name();
+      var contNum = parseInt(str.charAt(str.length-1));
+      onChange({
+        ...noteProps,
+        x: e.target.position().x,
+        y: e.target.position().y,
+        container: contNum
+      })
+      console.log(
+        contNum
+        );
+    }
+
     //check if there is anything on the bulb
     const bulb = e.target.children.filter(
       child => child.getAttrs().className === "bulb" 
       )[0].getAbsolutePosition();
+    
+    // look in the middle of the bulb
     const bulbPositionShape = layerRef.current.getIntersection({x:bulb.x+10, y:bulb.y+10});
     if (bulbPositionShape.getAttrs().className === 'prong') {
       console.log('Image', bulbPositionShape.parent.getAttrs().noteProps, grpRef.current);
@@ -85,23 +129,43 @@ export function StickyNote({
     }
   }
 
+  
+
   return (
-    <div className="item">
     <Group
-        className={"text component"}
+        name={"text component"}
         x={x} 
         y={y} 
         noteProps={noteProps}
+        // dragDistance={e => console.log("dragdist", e)}
         draggable
         ref={grpRef}
         // onDragStart={(e) => {
         //   console.log('start'+e.target.position().x);
         // }}
-        onDragEnd={handleCoordChange}
+        onDragEnd={handleDragEnd}
+        onDragStart={handleDragStart}
         // onDragStart={() => {
         //   console.log('hu');
         // }}
+        onMouseOver={onSelect}
         >
+        { pipelineButton && 
+          <EngineContainer 
+          width={width}
+          height={height}
+
+          engine={engine}
+          engineSize={100}
+          
+          noteProps={noteProps}
+          onReplace={onReplace}
+          onGenerate={onGenerate}
+          onChange={onChange}
+          onTextClick={onTextClick}
+          />
+        }
+
         { isSelected &&
           <Html 
             class={"button"}
@@ -109,6 +173,15 @@ export function StickyNote({
             groupProps={{ x: width-40, y: height*1.1+10 }} 
             divProps={{ style: { opacity: 0.63} }} >
             <button class="Delete-note-btn" onClick={onDelete} >Delete</button>
+          </Html>
+        }
+        { (isSelected && !pipelineButton) &&
+          <Html 
+            class={"button"}
+            innerRef={genBtnRf}
+            groupProps={{ x: width-140, y: height*1.1+10 }} 
+            divProps={{ style: { opacity: 0.83} }} >
+            <button class="Add-note-btn" onClick={e => {setPipelineButton(true)}} >Add Engine</button>
           </Html>
         }
       {/* <Rect
@@ -136,11 +209,11 @@ export function StickyNote({
         scaleY={isSelected ? 1.2 : 1}
         opacity={0.42}
         shadowColor="black"
-        shadowBlur={10}
-        shadowOpacity={0.3}
-        shadowOffsetX={10}
-        shadowOffsetY={10}
-        onMouseOver={onSelect}
+        shadowBlur={pipelineButton ? 0 : 10}
+        shadowOpacity={pipelineButton ? 0 : 0.3}
+        shadowOffsetX={pipelineButton ? 0 : 10}
+        shadowOffsetY={pipelineButton ? 0 : 10}
+        //onMouseOver={onSelect}
         // do not put drag functions here
       />
       <InputText
@@ -177,7 +250,7 @@ export function StickyNote({
         shadowColor="black"
         visible={isSelected ? true : false} 
       />
+      
     </Group>
-    </div>
   );
 }

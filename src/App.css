@@ -43,7 +43,7 @@
   border-radius: 4px;
   color: white;
   cursor: pointer;
-  padding: 15px 32px;
+  padding: 9px 16px;
   text-align: center;
   transition: all 200ms;
   vertical-align: baseline;
@@ -52,9 +52,9 @@
   -webkit-user-select: none;
   touch-action: manipulation;
   display: inline-block;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: 500;
-  line-height: 20px;
+  line-height: 10px;
 }
 
 

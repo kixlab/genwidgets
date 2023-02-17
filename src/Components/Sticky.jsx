@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Stage, Layer } from "react-konva";
+import { Rect, Stage, Layer } from "react-konva";
 import { StickyNote } from "./StickyNote";
+import { NoteContainer } from "./NoteContainer/NoteContainer";
+import axios from 'axios';
 
 const JOIN_DIST = 300;
 
@@ -29,8 +31,10 @@ function isTouchEnabled() {
 
 export const Sticky = () => {
   const newid = useRef(0);
+  const contid = useRef(0);
   const [notes, setNotes] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
+  const [containers, setContainers] = useState([])
 
   const [minDistance, setMinDistance] = useState({ distance: null, nodes: [] });
 
@@ -40,6 +44,7 @@ export const Sticky = () => {
   const [scale, setScale] = useState(1);
 
   const layerRef = useRef(null);
+  const engineRef = useRef(null);
 
   // for stage pan and zoom
 
@@ -150,6 +155,12 @@ export const Sticky = () => {
   const handleDeleteClick = () => {
     setNotes(notes.filter((note) => note.id!== selectedId));
     setSelectedId(null); 
+    // const data = { prompt: [...notes].filter(note => note.id === selectedId)[0].text }
+    //   axios
+    //   .post(`http://localhost:8080/api/generate`, data)
+    //   .then((response) => {
+    //     console.log(response)
+    // });
   }
 
   useEffect(() => { 
@@ -216,6 +227,65 @@ export const Sticky = () => {
       setSelectedId(null); 
     }
   }
+  
+  const handleAddCont = (e) => {
+    setContainers([...containers, 
+      { id: contid.current++,
+        x: 100,
+        y: 100,
+        height: 100,
+        width: 200
+      }
+    ]);
+  }
+
+  const handleGenerateClick = (e) => {
+    e.preventDefault();
+    const selectNote = [...notes].filter(note => note.id === selectedId)[0];
+    const engineProps = selectNote.engine;
+    const data = { 
+      prompt: selectNote.text,
+      engine: engineProps.eng,
+      maxTokens: parseFloat(engineProps.maxTokens),
+      temperature: parseFloat(engineProps.temperature),
+      topP: parseFloat(engineProps.topP),
+      frequencyPen: parseFloat(engineProps.frequencyPen),
+      presencePen: parseFloat(engineProps.presencePen),
+      bestOf: parseFloat(engineProps.bestOf),
+      n: parseFloat(engineProps.n),
+    }
+    axios
+    .post(`http://localhost:8080/api/generate`, data)
+    .then((response) => {
+      console.log(response.data)
+      if (response.data.success) {
+        setNotes([...notes, { 
+        x: 200,
+        y: 200,
+        id: newid.current++,
+        text: `${response.data.generations[0]}`, 
+        width: 200,
+        height: 200,
+        prongs: [], //prongs
+        engine: { 
+          // prompt: GENERATION PROMPT HERE,
+          eng: "text-davinci-003",
+          maxTokens: "256",
+          temperature: "0.7",
+          topP: "1",
+          frequencyPen: "0.0",
+          presencePen: "0.0",
+          bestOf: "1",
+          n: "1",
+        },
+        container: null
+      }
+      ]);
+      }
+
+    });
+    
+  }
 
 
   const DELETE_KEY = 46;
@@ -242,9 +312,9 @@ export const Sticky = () => {
         ...lastTouch
         // x: clipboardNote.x + 30,
         // y: clipboardNote.y + 30
-      }]);
-    }}
-  }
+      }
+    ]);}
+  }}
   
   // change some attr(s) of a note and put the new note in here
   const replaceNote = (newNote) => {
@@ -281,15 +351,16 @@ export const Sticky = () => {
       tabIndex={1} 
       onKeyDown={handleKeyDown}
       >
-      <aside><h1>Genwidgets</h1></aside>
-      <p>
+      <aside><h1>Genwidgets</h1></aside>   
+      {/* <p>
         Minimum distance between nodes:{" "}
         {minDistance.nodes.map(node => node.id).join(", ")} ({minDistance.distance})
-      </p>
+      </p> <button class="Concat-note-btn" onClick={handleConcatClick}>Concat Near</button>*/}
+      <button class="Concat-note-btn" onClick={handleAddCont}>Add Container</button>
       <p>
         Double tap on canvas to add text. Pan and zoom canvas as needed.
       </p>
-    <button class="Concat-note-btn" onClick={handleConcatClick}>Concat Near</button>
+    
     <Stage
       width={window.innerWidth}
       height={window.innerHeight}
@@ -306,6 +377,18 @@ export const Sticky = () => {
           width: 200,
           height: 200,
           prongs: [], //prongs
+          engine: { 
+            // prompt: GENERATION PROMPT HERE,
+            eng: "text-davinci-003",
+            maxTokens: "256",
+            temperature: "0.7",
+            topP: "1",
+            frequencyPen: "0.0",
+            presencePen: "0.0",
+            bestOf: "1",
+            n: "1",
+          },
+          container: null
         }]);
       }}}
 
@@ -318,8 +401,11 @@ export const Sticky = () => {
       // ---------------------
 
     >
+      
       <Layer ref={layerRef}>
+      
       {notes.map((note, index) => {
+        if (note.container === null) {
         return(
         <StickyNote
           key={index}
@@ -329,6 +415,7 @@ export const Sticky = () => {
           width={note.width}
           height={note.height}
           prongs={note.prongs}
+          engine={note.engine}
           
           noteProps={note}
           layerRef={layerRef}
@@ -356,10 +443,63 @@ export const Sticky = () => {
             setIsEditing(true);
           }}
           onDelete={handleDeleteClick}
+          onGenerate={handleGenerateClick}
         />
         );
+        }
       })}
+      {containers.map((container, index) => {
+        return(
+          <NoteContainer
+            key={index}
+            x={container.x}
+            y={container.y}
+            width={container.width}
+            height={container.height}
+            layerRef={layerRef}
+            onChange={(newAttrs) => {
+              const nwConts = containers.slice();
+              nwConts[index] = newAttrs;
+              setContainers(nwConts);
+            }}
+            setNotes={setNotes}
+            // onNoteChange={(newAttrs) => {
+            //   const nwNotes = notes.slice();
+            //   nwNotes[index] = newAttrs;
+            //   setNotes(nwNotes);
+            // }}
+            allNotes={notes}
+            containerProps={container}
+          />
+        )
+      })
+      }
       </Layer>
+      {/* <Layer>
+        <Rect
+        name="dragging-engine"
+        x={0}
+        y={0}
+        width={96}
+        height={96}
+        fill="red"
+        ref={engineRef}
+        draggable
+        onDragStart={(e) => {
+          console.log(engineRef.current, layerRef.current);
+          layerRef.current.add(engineRef.current);
+          }
+        }
+        onDragEnd={(e) => {
+          console.log(layerRef.current.getIntersection(e.target.position()).name(),e.target.position());
+          if (layerRef.current.getIntersection(e.target.position()).name() !== "dragging-engine") {
+            console.log(layerRef.current.getIntersection(e.target.position()).getParent(),e.target.position());
+          }
+          }
+        }
+        
+        />
+      </Layer> */}
     </Stage>
     </div>
   );
